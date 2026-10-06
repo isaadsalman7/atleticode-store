@@ -1,0 +1,86 @@
+{% doc %}
+  Renders visible line-item properties, with an image or file link when the property is an uploaded artwork file.
+
+  @param {line_item} item - Cart line item
+  @param {boolean} [files_only] - When true, render uploaded files and skip other properties
+
+  @example
+  {% render 'atc-line-properties', item: item %}
+{% enddoc %}
+
+{% for property in item.properties %}
+  {% if files_only %}
+    {% unless property.last contains '/uploads/' %}
+      {% continue %}
+    {% endunless %}
+  {% endif %}
+  {% assign property_first = property.first | slice: 0 %}
+  {% if property.last != blank %}
+    {% if property_first != '_' %}
+      <div class="atc-line-file">
+        <p class="atc-line-file__label">{{ property.first | escape }}</p>
+        {% if property.last contains '/uploads/' %}
+          {% assign file_name = property.last | split: '/' | last %}
+          {% assign file_lower = file_name | downcase %}
+          {% if file_lower contains '.png' %}
+            <a href="{{ property.last }}">
+              <img src="{{ property.last }}" alt="{{ file_name | escape }}" width="72" height="72">
+            </a>
+          {% else %}
+            {% if file_lower contains '.jpg' %}
+              <a href="{{ property.last }}">
+                <img src="{{ property.last }}" alt="{{ file_name | escape }}" width="72" height="72">
+              </a>
+            {% else %}
+              {% if file_lower contains '.webp' %}
+                <a href="{{ property.last }}">
+                  <img src="{{ property.last }}" alt="{{ file_name | escape }}" width="72" height="72">
+                </a>
+              {% else %}
+                <a href="{{ property.last }}">{{ file_name | escape }}</a>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% else %}
+          <p>{{ property.last | escape }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% stylesheet %}
+  .atc-line-file {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+  }
+
+  .atc-line-file__label,
+  .atc-line-file a,
+  .atc-line-file p {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .atc-line-file a {
+    color: inherit;
+  }
+
+  .atc-line-file img {
+    display: block;
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: cover;
+    background: #f3f3f3;
+  }
+
+  .atc-line-file a:focus-visible {
+    outline: var(--atc-focus);
+    outline-offset: 3px;
+  }
+{% endstylesheet %}

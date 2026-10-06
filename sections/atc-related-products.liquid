@@ -1,0 +1,104 @@
+{% if product != blank %}
+  <atc-recommendations
+    class="atc-related"
+    data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.limit }}&intent=related"
+    data-performed="{{ recommendations.performed }}"
+  >
+    {% if recommendations.performed %}
+      {% if recommendations.products_count > 0 %}
+        <div class="atc-related__intro">
+          {% if section.settings.heading != blank %}
+            <h2>{{ section.settings.heading | escape }}</h2>
+          {% endif %}
+        </div>
+        <div class="atc-related__grid">
+          {% for product in recommendations.products limit: section.settings.limit %}
+            {% render 'atc-product-card',
+              product: product,
+              sizes: '(min-width: 990px) 22vw, 72vw'
+            %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </atc-recommendations>
+{% endif %}
+
+{% stylesheet %}
+  .atc-related {
+    display: block;
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+    border-top: 1px solid var(--atc-line);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-related:not(:has(.atc-card)) {
+    display: none;
+  }
+
+  .atc-related__intro h2 {
+    margin: 0 0 1.75rem;
+    font-family: var(--atc-font-display);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .atc-related__grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(72vw, 1fr);
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .atc-related__grid > .atc-card {
+    scroll-snap-align: start;
+  }
+
+  @media (min-width: 750px) {
+    .atc-related__grid {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      overflow: visible;
+    }
+  }
+
+  @media (min-width: 990px) {
+    .atc-related__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.related",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "Complete the system"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "t:atc.home.products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.commerce.related"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,60 @@
+<section class="atc-not-found">
+  <p class="atc-not-found__code">{{ 'atc.not_found.code' | t }}</p>
+  <h1>{{ 'atc.not_found.heading' | t }}</h1>
+  <p class="atc-not-found__text">{{ 'atc.not_found.text' | t }}</p>
+  <a class="atc-button" href="{{ routes.root_url }}">
+    {{ 'atc.not_found.return' | t }}
+  </a>
+</section>
+
+{% stylesheet %}
+  .atc-not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    min-height: calc(100svh - var(--atc-header-height));
+    padding: clamp(3rem, 8vw, 6rem) clamp(1.25rem, 4vw, 3rem);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-not-found__code {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .atc-not-found h1 {
+    margin: 0;
+    font-family: var(--atc-font-display);
+    font-size: clamp(4.5rem, 18vw, 10rem);
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    line-height: 0.85;
+    text-transform: uppercase;
+  }
+
+  .atc-not-found__text {
+    max-width: 28rem;
+    margin: 0;
+    font-family: var(--atc-font-body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.not_found.name",
+  "tag": "section",
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:atc.not_found.name"
+    }
+  ]
+}
+{% endschema %}

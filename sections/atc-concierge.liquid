@@ -1,0 +1,291 @@
+<section id="AtcConcierge" class="atc-concierge">
+  <div class="atc-concierge__intro">
+    {% if section.settings.eyebrow != blank %}
+      <p class="atc-concierge__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {% endif %}
+    {% if section.settings.heading != blank %}
+      <h2>{{ section.settings.heading | escape | newline_to_br }}</h2>
+    {% endif %}
+    {% if section.settings.text != blank %}
+      <p class="atc-concierge__text">{{ section.settings.text | escape }}</p>
+    {% endif %}
+    {% if section.settings.phone != blank %}
+      <a class="atc-concierge__phone" href="tel:{{ section.settings.phone | replace: ' ', '' }}">
+        {{ section.settings.phone | escape }}
+      </a>
+    {% endif %}
+  </div>
+
+  {% assign form_id = 'ContactForm-' | append: section.id %}
+  {% form 'contact', id: form_id, class: 'atc-concierge__form' %}
+    <input type="hidden" name="contact[id]" value="{{ form_id }}">
+
+    {% if form.posted_successfully? %}
+      <p class="atc-concierge__success" role="status" tabindex="-1">
+        {{ 'atc.policies.sent' | t }}
+      </p>
+    {% endif %}
+
+    {% if form.errors %}
+      <div class="atc-concierge__errors" role="alert" tabindex="-1">
+        {{ form.errors | default_errors }}
+      </div>
+    {% endif %}
+
+    <div class="atc-concierge__fields">
+      <label for="AtcConciergeName-{{ section.id }}">
+        {{ 'atc.policies.name' | t }}
+        <input
+          id="AtcConciergeName-{{ section.id }}"
+          type="text"
+          name="contact[name]"
+          autocomplete="name"
+          value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+        >
+      </label>
+
+      <label for="AtcConciergeEmail-{{ section.id }}">
+        {{ 'atc.policies.email' | t }}
+        <input
+          id="AtcConciergeEmail-{{ section.id }}"
+          type="email"
+          name="contact[email]"
+          autocomplete="email"
+          required
+          value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+        >
+      </label>
+
+      <label for="AtcConciergePhone-{{ section.id }}">
+        {{ 'atc.policies.phone_field' | t }}
+        <input
+          id="AtcConciergePhone-{{ section.id }}"
+          type="tel"
+          name="contact[phone]"
+          autocomplete="tel"
+          value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+        >
+      </label>
+
+      <label for="AtcConciergeSubject-{{ section.id }}">
+        {{ 'atc.policies.subject' | t }}
+        <select id="AtcConciergeSubject-{{ section.id }}" name="contact[subject]" required>
+          <option value="" disabled selected>{{ 'atc.policies.subject_placeholder' | t }}</option>
+          {% for block in section.blocks %}
+            {% if block.settings.label != blank %}
+              <option value="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>
+                {{ block.settings.label | escape }}
+              </option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="atc-concierge__comments" for="AtcConciergeBody-{{ section.id }}">
+        {{ 'atc.policies.message' | t }}
+        <textarea
+          id="AtcConciergeBody-{{ section.id }}"
+          name="contact[body]"
+          rows="5"
+        >{% if form.body %}{{ form.body }}{% endif %}</textarea>
+      </label>
+    </div>
+
+    <button class="atc-button" type="submit">
+      {{ 'atc.policies.submit' | t }}
+    </button>
+  {% endform %}
+</section>
+
+{% stylesheet %}
+  .atc-concierge {
+    display: grid;
+    gap: 2.5rem;
+    scroll-margin-top: var(--atc-header-height);
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+    border-top: 1px solid var(--atc-line);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-concierge__eyebrow {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-concierge h2 {
+    margin: 0.6rem 0 0;
+    max-width: 12em;
+    font-family: var(--atc-font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    text-transform: uppercase;
+    overflow-wrap: break-word;
+  }
+
+  .atc-concierge__text {
+    max-width: 36rem;
+    margin: 1rem 0 0;
+    font-family: var(--atc-font-body);
+    line-height: 1.65;
+  }
+
+  .atc-concierge__phone {
+    display: inline-flex;
+    margin-top: 1.5rem;
+    color: var(--atc-ink);
+    font-family: var(--atc-font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .atc-concierge__form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .atc-concierge__fields {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .atc-concierge label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .atc-concierge input,
+  .atc-concierge select,
+  .atc-concierge textarea {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-body);
+    font-size: 1rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .atc-concierge textarea {
+    min-height: 8rem;
+    resize: vertical;
+  }
+
+  .atc-concierge input:focus-visible,
+  .atc-concierge select:focus-visible,
+  .atc-concierge textarea:focus-visible,
+  .atc-concierge__phone:focus-visible {
+    outline: var(--atc-focus);
+    outline-offset: 3px;
+  }
+
+  .atc-concierge__success,
+  .atc-concierge__errors {
+    width: 100%;
+    margin: 0;
+    padding: 1rem;
+    font-family: var(--atc-font-body);
+    font-size: 0.9375rem;
+    letter-spacing: 0;
+    line-height: 1.5;
+    text-transform: none;
+  }
+
+  .atc-concierge__success {
+    background: var(--atc-ink);
+    color: var(--atc-white);
+  }
+
+  .atc-concierge__errors {
+    border: 1px solid var(--atc-ink);
+  }
+
+  @media (min-width: 750px) {
+    .atc-concierge__fields {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .atc-concierge__comments {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 990px) {
+    .atc-concierge {
+      grid-template-columns: minmax(16rem, 0.8fr) minmax(0, 1.2fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.policies.concierge",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:atc.home.eyebrow",
+      "default": "Concierge"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "Athlete concierge\nand exchanges"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "t:atc.home.text",
+      "default": "Send a sizing, shipping, or care question. The laboratory replies by email."
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "t:atc.policies.phone"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "subject",
+      "name": "t:atc.policies.subject",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "t:atc.policies.subject",
+          "default": "Shipping"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.policies.concierge"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,192 @@
+<section class="atc-lab">
+  <div class="atc-lab__header">
+    <div>
+      {% if section.settings.eyebrow != blank %}
+        <p class="atc-lab__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {% endif %}
+      {% if section.settings.heading != blank %}
+        <h2 class="atc-lab__heading">{{ section.settings.heading | escape }}</h2>
+      {% endif %}
+    </div>
+    {% if section.settings.collection != blank %}
+      {% if section.settings.view_all_label != blank %}
+        <a class="atc-lab__view-all" href="{{ section.settings.collection.url }}">
+          {{ section.settings.view_all_label | escape }}
+        </a>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  {% if section.settings.collection != blank %}
+    {% if section.settings.collection.products_count > 0 %}
+      <div class="atc-lab__grid">
+        {% for product in section.settings.collection.products limit: section.settings.products_to_show %}
+          {% render 'atc-product-card', product: product, sizes: '(min-width: 990px) 25vw, 72vw' %}
+        {% endfor %}
+      </div>
+    {% elsif request.design_mode %}
+      <p class="atc-lab__empty">{{ 'atc.home.empty_collection' | t }}</p>
+    {% endif %}
+  {% elsif request.design_mode %}
+    <p class="atc-lab__empty">{{ 'atc.home.empty_collection' | t }}</p>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .atc-lab {
+    padding: 4rem clamp(1.25rem, 4vw, 3rem) 5rem;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-lab__header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .atc-lab__eyebrow {
+    margin: 0 0 0.75rem;
+    font-family: var(--atc-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-lab__heading {
+    margin: 0;
+    font-family: var(--atc-font-display);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .atc-lab__view-all {
+    font-family: var(--atc-font-display);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--atc-ink);
+    border-bottom: 2px solid var(--atc-ink);
+    padding-bottom: 0.2rem;
+  }
+
+  .atc-lab__view-all:hover {
+    opacity: 0.6;
+  }
+
+  .atc-lab__view-all:focus-visible {
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+
+  .atc-lab__grid {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0.25rem;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .atc-lab__grid > .atc-card {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+  }
+
+  .atc-lab__empty {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  @media (min-width: 750px) {
+    .atc-lab__header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .atc-lab__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2rem 1.5rem;
+      overflow: visible;
+    }
+
+    .atc-lab__grid > .atc-card {
+      flex: none;
+    }
+  }
+
+  @media (min-width: 990px) {
+    .atc-lab {
+      padding-block: 5rem 6rem;
+    }
+
+    .atc-lab__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.home.laboratory",
+  "tag": "div",
+  "class": "atc-lab-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:atc.home.eyebrow",
+      "default": "Core essentials"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "The laboratory line"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:atc.home.collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "t:atc.home.products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "t:atc.home.view_all",
+      "default": "View all products"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.home.laboratory"
+    }
+  ]
+}
+{% endschema %}

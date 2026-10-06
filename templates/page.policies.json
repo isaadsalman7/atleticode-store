@@ -1,0 +1,161 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "atc_ticker": {
+      "type": "atc-policy-ticker",
+      "blocks": {
+        "telemetry": {
+          "type": "status",
+          "settings": {
+            "text": "System telemetry // real-time lab"
+          }
+        },
+        "trial": {
+          "type": "status",
+          "settings": {
+            "text": "30-day raceday elite trial active"
+          }
+        },
+        "logistics": {
+          "type": "status",
+          "settings": {
+            "text": "Global precision logistics // nitrogen sealed"
+          }
+        },
+        "privacy": {
+          "type": "status",
+          "settings": {
+            "text": "Biometric data purged within 24 hours"
+          }
+        }
+      },
+      "block_order": ["telemetry", "trial", "logistics", "privacy"]
+    },
+    "atc_dossier": {
+      "type": "atc-policy-dossier",
+      "settings": {
+        "eyebrow": "Protocols",
+        "heading": "Standards,\nlogistics and\nathlete rights",
+        "text": "Shipping, returns, care, and technical specifications for the laboratory line. Edit each protocol in the theme editor."
+      },
+      "blocks": {
+        "trial": {
+          "type": "protocol",
+          "settings": {
+            "number": "01",
+            "heading": "30-day raceday elite trial",
+            "text": "Wear it in training. If the specimen does not meet the standard, return it within 30 days of delivery for a refund to the original payment method.",
+            "link_label": "Start a return",
+            "link": "#AtcConcierge",
+            "spec_label_1": "Window",
+            "spec_value_1": "30 days",
+            "spec_label_2": "Condition",
+            "spec_value_2": "Unwashed",
+            "spec_label_3": "Refund",
+            "spec_value_3": "Original payment",
+            "spec_label_4": "Exclusions",
+            "spec_value_4": "Final sale noted"
+          }
+        },
+        "logistics": {
+          "type": "protocol",
+          "settings": {
+            "number": "02",
+            "heading": "Global precision logistics",
+            "text": "Made to order in Sialkot and delivered worldwide in 10–14 business days. Motorsport, precision sports, and elite boxing include free worldwide shipping. Apparel, mid-range gloves, and accessories use a regional flat rate calculated at checkout. Orders dispatch through DHL, FedEx, and UPS Express. Landed pricing states duties before payment.",
+            "link_label": "Track an order",
+            "link": "/account",
+            "spec_label_1": "Origin",
+            "spec_value_1": "Sialkot",
+            "spec_label_2": "Window",
+            "spec_value_2": "10–14 business days",
+            "spec_label_3": "Carriers",
+            "spec_value_3": "DHL, FedEx, UPS Express",
+            "spec_label_4": "Pricing",
+            "spec_value_4": "Landed at checkout"
+          }
+        },
+        "care": {
+          "type": "protocol",
+          "settings": {
+            "number": "03",
+            "heading": "Care and repair",
+            "text": "Cold wash, hang dry, and do not use fabric softener. Repair requests go through the concierge with the order number and the specimen name.",
+            "link_label": "Ask about care",
+            "link": "#AtcConcierge",
+            "spec_label_1": "Wash",
+            "spec_value_1": "Cold",
+            "spec_label_2": "Dry",
+            "spec_value_2": "Hang",
+            "spec_label_3": "Iron",
+            "spec_value_3": "Do not iron",
+            "spec_label_4": "Repair",
+            "spec_value_4": "Concierge"
+          }
+        },
+        "privacy": {
+          "type": "protocol",
+          "settings": {
+            "number": "04",
+            "heading": "Technical specifications and privacy",
+            "text": "Product measurements live on the specimen page. Account and order data stay in Shopify. This page does not store biometric readings.",
+            "spec_label_1": "Fit data",
+            "spec_value_1": "Product page",
+            "spec_label_2": "Orders",
+            "spec_value_2": "Shopify account",
+            "spec_label_3": "Payments",
+            "spec_value_3": "Checkout",
+            "spec_label_4": "Sensors",
+            "spec_value_4": "Not collected here"
+          }
+        }
+      },
+      "block_order": ["trial", "logistics", "care", "privacy"]
+    },
+    "atc_concierge": {
+      "type": "atc-concierge",
+      "blocks": {
+        "shipping": {
+          "type": "subject",
+          "settings": {
+            "label": "Shipping"
+          }
+        },
+        "returns": {
+          "type": "subject",
+          "settings": {
+            "label": "Returns"
+          }
+        },
+        "care": {
+          "type": "subject",
+          "settings": {
+            "label": "Care"
+          }
+        },
+        "sizing": {
+          "type": "subject",
+          "settings": {
+            "label": "Sizing"
+          }
+        }
+      },
+      "block_order": ["shipping", "returns", "care", "sizing"],
+      "settings": {
+        "eyebrow": "Concierge",
+        "heading": "Athlete concierge\nand exchanges",
+        "text": "Send a shipping, return, care, or sizing question. Replies go to the email address you enter.",
+        "phone": ""
+      }
+    }
+  },
+  "order": ["atc_ticker", "atc_dossier", "atc_concierge"]
+}

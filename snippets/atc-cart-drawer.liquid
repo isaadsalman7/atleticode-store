@@ -1,0 +1,87 @@
+{% doc %}
+  Renders the made-to-order lead time, tier shipping note, and artwork previews for the current cart.
+
+  Free worldwide shipping is stated only when every line is tier 1.
+  A mixed cart says tier 1 lines include free shipping and the rest is calculated at checkout.
+
+  @param {boolean} [show_files] - When false, omit artwork previews and keep the timing and shipping notes
+
+  @example
+  {% render 'atc-cart-drawer' %}
+{% enddoc %}
+
+{% unless cart.empty? %}
+  {% liquid
+    assign tier_one_count = 0
+    assign other_count = 0
+  %}
+  {% for item in cart.items %}
+    {% liquid
+      assign line_tier = item.product.metafields.custom.shipping_tier.value | downcase
+      if line_tier == blank
+        if item.product.tags contains 'tier-1'
+          assign line_tier = 'tier-1'
+        endif
+      endif
+      if line_tier == blank
+        if item.product.tags contains 'shipping-tier-1'
+          assign line_tier = 'tier-1'
+        endif
+      endif
+      if line_tier == 'tier_1'
+        assign line_tier = 'tier-1'
+      endif
+      if line_tier == '1'
+        assign line_tier = 'tier-1'
+      endif
+      if line_tier == 'free'
+        assign line_tier = 'tier-1'
+      endif
+      if line_tier == 'tier-1'
+        assign tier_one_count = tier_one_count | plus: 1
+      else
+        assign other_count = other_count | plus: 1
+      endif
+    %}
+    {% unless show_files == false %}
+      {% render 'atc-line-properties', item: item, files_only: true %}
+    {% endunless %}
+  {% endfor %}
+
+  <div class="atc-cart-notice">
+    <p>{{ 'atc.commerce.made_to_order_lead' | t }}</p>
+    <p>
+      {% if other_count == 0 %}
+        {{ 'atc.commerce.shipping_tier_1' | t }}
+      {% else %}
+        {% if tier_one_count > 0 %}
+          {{ 'atc.commerce.shipping_mixed' | t }}
+        {% else %}
+          {{ 'atc.commerce.shipping_tier_standard' | t }}
+        {% endif %}
+      {% endif %}
+    </p>
+  </div>
+{% endunless %}
+
+{% stylesheet %}
+  .atc-cart-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+  }
+
+  .atc-cart-notice p {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  #cart-drawer .atc-cart-notice p {
+    color: #d4d4d4;
+  }
+{% endstylesheet %}

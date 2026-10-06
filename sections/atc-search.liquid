@@ -1,0 +1,198 @@
+<section class="atc-search">
+  <header class="atc-search__header">
+    <h1>{{ 'atc.commerce.search' | t }}</h1>
+    <form class="atc-search__form" action="{{ routes.search_url }}" method="get" role="search">
+      <label class="visually-hidden" for="AtcSearch-{{ section.id }}">
+        {{ 'atc.header.search' | t }}
+      </label>
+      <input
+        id="AtcSearch-{{ section.id }}"
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ 'atc.commerce.search_placeholder' | t }}"
+      >
+      <input type="hidden" name="options[prefix]" value="last">
+      <button class="atc-button" type="submit">{{ 'atc.header.search' | t }}</button>
+    </form>
+  </header>
+
+  {% if search.performed %}
+    {% if search.results_count == 0 %}
+      <div class="atc-search__empty">
+        <p>{{ 'atc.commerce.search_empty' | t: terms: search.terms }}</p>
+        <a class="atc-button" href="{{ routes.all_products_collection_url }}">
+          {{ 'atc.commerce.continue_shopping' | t }}
+        </a>
+      </div>
+    {% else %}
+      <p class="atc-search__count">
+        {{ 'atc.commerce.search_count' | t: count: search.results_count, terms: search.terms }}
+      </p>
+      {% paginate search.results by section.settings.results_per_page %}
+        <div class="atc-search__grid">
+          {% for item in search.results %}
+            {% if item.object_type == 'product' %}
+              {% render 'atc-product-card', product: item, sizes: '(min-width: 990px) 25vw, 72vw' %}
+            {% else %}
+              <a class="atc-search__result" href="{{ item.url }}">
+                <span>{{ item.title | escape }}</span>
+                <span class="atc-search__type">{{ item.object_type | escape }}</span>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% if paginate.pages > 1 %}
+          <nav class="atc-search__pagination" aria-label="{{ 'atc.commerce.pagination' | t }}">
+            {% if paginate.previous %}
+              <a class="atc-button atc-button--ghost" href="{{ paginate.previous.url }}">
+                {{ 'atc.commerce.previous' | t }}
+              </a>
+            {% endif %}
+            <p>{{ 'atc.commerce.page' | t: page: paginate.current_page, pages: paginate.pages }}</p>
+            {% if paginate.next %}
+              <a class="atc-button atc-button--ghost" href="{{ paginate.next.url }}">
+                {{ 'atc.commerce.next' | t }}
+              </a>
+            {% endif %}
+          </nav>
+        {% endif %}
+      {% endpaginate %}
+    {% endif %}
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .atc-search {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-search__header h1 {
+    margin: 0 0 1.5rem;
+    font-family: var(--atc-font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+
+  .atc-search__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .atc-search__form input[type='search'] {
+    flex: 1 1 16rem;
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-body);
+    font-size: 1rem;
+  }
+
+  .atc-search__count,
+  .atc-search__empty p,
+  .atc-search__pagination p {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-search__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .atc-search__grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .atc-search__result {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--atc-line);
+    color: inherit;
+    font-family: var(--atc-font-display);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .atc-search__type {
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--atc-muted);
+  }
+
+  .atc-search__pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .atc-search input:focus-visible,
+  .atc-search a:focus-visible {
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+
+  @media (min-width: 750px) {
+    .atc-search__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 990px) {
+    .atc-search__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .atc-search__result {
+      grid-column: 1 / -1;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.search",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "results_per_page",
+      "label": "t:atc.commerce.products_per_page",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.commerce.search"
+    }
+  ]
+}
+{% endschema %}

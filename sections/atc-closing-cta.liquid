@@ -1,0 +1,90 @@
+<section class="atc-closing">
+  <div class="atc-closing__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="atc-closing__heading">{{ section.settings.heading | escape | newline_to_br }}</h2>
+    {% endif %}
+    {% if section.settings.button_label != blank %}
+      {% if section.settings.button_link != blank %}
+        <a class="atc-button" href="{{ section.settings.button_link }}">
+          {{ section.settings.button_label | escape }}
+        </a>
+      {% else %}
+        <span class="atc-button">{{ section.settings.button_label | escape }}</span>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .atc-closing {
+    padding: 5rem clamp(1.25rem, 4vw, 3rem);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-closing__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    padding: 4.5rem 1rem;
+    border-block: 1px solid var(--atc-line);
+    text-align: center;
+  }
+
+  .atc-closing__heading {
+    margin: 0;
+    max-width: 12em;
+    font-family: var(--atc-font-display);
+    font-size: clamp(2.75rem, 8vw, 7rem);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 990px) {
+    .atc-closing {
+      padding-block: 7rem;
+    }
+
+    .atc-closing__inner {
+      padding-block: 6rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.home.closing",
+  "tag": "div",
+  "class": "atc-closing-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "Built for\nlimitless\npotential"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:atc.home.button_label",
+      "default": "Join the lab"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:atc.home.button_link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.home.closing"
+    }
+  ]
+}
+{% endschema %}

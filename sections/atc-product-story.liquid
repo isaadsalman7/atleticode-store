@@ -1,0 +1,137 @@
+<section class="atc-story">
+  <div class="atc-story__intro">
+    {% if section.settings.eyebrow != blank %}
+      <p class="atc-story__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {% endif %}
+    {% if section.settings.heading != blank %}
+      <h2 class="atc-story__heading">{{ section.settings.heading | escape | newline_to_br }}</h2>
+    {% endif %}
+  </div>
+
+  <div class="atc-story__body">
+    {% if section.settings.show_description %}
+      {% if product.description != blank %}
+        <div class="atc-story__description">{{ product.description }}</div>
+      {% endif %}
+    {% endif %}
+    {% for block in section.blocks %}
+      <article class="atc-story__note" {{ block.shopify_attributes }}>
+        {% if block.settings.heading != blank %}
+          <h3>{{ block.settings.heading | escape }}</h3>
+        {% endif %}
+        {% if block.settings.text != blank %}
+          <p>{{ block.settings.text | escape | newline_to_br }}</p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .atc-story {
+    display: grid;
+    gap: 2rem;
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+    border-top: 1px solid var(--atc-line);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-story__eyebrow {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-story__heading,
+  .atc-story__note h3 {
+    margin: 0.5rem 0 0;
+    font-family: var(--atc-font-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .atc-story__heading {
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 0.95;
+  }
+
+  .atc-story__body {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .atc-story__description,
+  .atc-story__note p {
+    margin: 0.75rem 0 0;
+    max-width: 42rem;
+    font-family: var(--atc-font-body);
+    line-height: 1.7;
+  }
+
+  .atc-story__description > *:first-child {
+    margin-top: 0;
+  }
+
+  @media (min-width: 990px) {
+    .atc-story {
+      grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1.3fr);
+      gap: 4rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.story",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:atc.home.eyebrow",
+      "default": "Architecture"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "Material architecture"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "t:atc.commerce.show_description",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "note",
+      "name": "t:atc.commerce.note",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:atc.home.heading",
+          "default": "Construction"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "t:atc.home.text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.commerce.story"
+    }
+  ]
+}
+{% endschema %}

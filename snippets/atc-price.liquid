@@ -1,0 +1,72 @@
+{% doc %}
+  Renders a product or variant price, including compare-at price and an optional sale badge.
+
+  @param {object} item - Product or variant with price and compare_at_price
+  @param {boolean} [badge] - Show a sale badge when the item is discounted
+
+  @example
+  {% render 'atc-price', item: product, badge: true %}
+{% enddoc %}
+
+{% liquid
+  assign price = item.price | money
+  assign compare_price = item.compare_at_price | money
+  assign on_sale = false
+  if item.compare_at_price > item.price
+    assign on_sale = true
+  endif
+%}
+
+<span class="atc-price">
+  {% if badge %}
+    {% if on_sale %}
+      <span class="atc-price__badge">{{ 'atc.commerce.sale' | t }}</span>
+    {% endif %}
+  {% endif %}
+  {% if item.price_varies %}
+    {{ 'atc.home.from_price' | t: price: price }}
+  {% else %}
+    {% if on_sale %}
+      <span class="visually-hidden">{{ 'atc.home.sale_price' | t }}</span>
+      <span class="atc-price__current">{{ price }}</span>
+      <s class="atc-price__compare">
+        <span class="visually-hidden">{{ 'atc.home.regular_price' | t }}</span>
+        {{ compare_price }}
+      </s>
+    {% else %}
+      <span class="visually-hidden">{{ 'atc.home.price' | t }}</span>
+      <span class="atc-price__current">{{ price }}</span>
+    {% endif %}
+  {% endif %}
+</span>
+
+{% stylesheet %}
+  .atc-price {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.35rem 0.6rem;
+    font-family: var(--atc-font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .atc-price__compare {
+    color: var(--atc-muted);
+    font-weight: 400;
+    text-decoration: line-through;
+  }
+
+  .atc-price__badge {
+    padding: 0.2rem 0.35rem;
+    background: var(--atc-ink);
+    color: var(--atc-white);
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+{% endstylesheet %}

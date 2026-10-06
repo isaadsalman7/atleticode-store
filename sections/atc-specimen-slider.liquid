@@ -1,0 +1,269 @@
+<section class="atc-specimens">
+  <div class="atc-specimens__toolbar">
+    <div class="atc-specimens__filters" aria-label="{{ 'atc.commerce.filters' | t }}">
+      {% for filter in collection.filters %}
+        {% if filter.values.size > 0 %}
+          <div class="atc-filter">
+            <p class="atc-filter__label">{{ filter.label | escape }}</p>
+            <ul class="atc-filter__list">
+              {% for value in filter.values %}
+                <li>
+                  {% if value.active %}
+                    <a class="atc-filter__value is-active" href="{{ value.url_to_remove }}">
+                      {{ value.label | escape }}
+                      <span class="visually-hidden">{{ 'atc.commerce.remove_filter' | t }}</span>
+                    </a>
+                  {% else %}
+                    <a class="atc-filter__value" href="{{ value.url_to_add }}">
+                      {{ value.label | escape }}
+                    </a>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <form class="atc-specimens__sort" action="{{ collection.url }}" method="get">
+      {% for filter in collection.filters %}
+        {% for value in filter.active_values %}
+          <input type="hidden" name="{{ value.param_name }}" value="{{ value.value | escape }}">
+        {% endfor %}
+      {% endfor %}
+      <label class="atc-specimens__sort-label" for="AtcSort-{{ section.id }}">
+        {{ 'atc.commerce.sort' | t }}
+      </label>
+      <select id="AtcSort-{{ section.id }}" name="sort_by">
+        {% for option in collection.sort_options %}
+          <option
+            value="{{ option.value | escape }}"
+            {% if option.value == collection.sort_by %}
+              selected
+            {% endif %}
+          >
+            {{ option.name | escape }}
+          </option>
+        {% endfor %}
+      </select>
+      <button class="atc-button atc-button--ghost" type="submit">
+        {{ 'atc.commerce.apply' | t }}
+      </button>
+    </form>
+  </div>
+
+  {% paginate collection.products by section.settings.products_per_page %}
+    <div class="atc-specimens__grid">
+      {% for product in collection.products %}
+        {% assign specimen_index = paginate.current_offset | plus: forloop.index %}
+        {% render 'atc-product-card',
+          product: product,
+          sizes: '(min-width: 990px) 30vw, 78vw',
+          specimen_index: specimen_index,
+          specimen_total: collection.products_count
+        %}
+      {% else %}
+        <p class="atc-specimens__empty">{{ 'atc.commerce.empty_collection' | t }}</p>
+      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+      <nav class="atc-specimens__pagination" aria-label="{{ 'atc.commerce.pagination' | t }}">
+        {% if paginate.previous %}
+          <a class="atc-button atc-button--ghost" href="{{ paginate.previous.url }}">
+            {{ 'atc.commerce.previous' | t }}
+          </a>
+        {% endif %}
+        <p>
+          {{ 'atc.commerce.page' | t: page: paginate.current_page, pages: paginate.pages }}
+        </p>
+        {% if paginate.next %}
+          <a class="atc-button atc-button--ghost" href="{{ paginate.next.url }}">
+            {{ 'atc.commerce.next' | t }}
+          </a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% endpaginate %}
+</section>
+
+{% stylesheet %}
+  .atc-specimens {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-specimens__toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--atc-line);
+  }
+
+  .atc-specimens__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 2.5rem;
+  }
+
+  .atc-filter__label,
+  .atc-specimens__sort-label {
+    margin: 0 0 0.6rem;
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-filter__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .atc-filter__value {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--atc-line);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .atc-filter__value.is-active,
+  .atc-filter__value:hover {
+    background: var(--atc-ink);
+    border-color: var(--atc-ink);
+    color: var(--atc-white);
+  }
+
+  .atc-specimens__sort {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem 1rem;
+  }
+
+  .atc-specimens__sort-label {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .atc-specimens select,
+  .atc-specimens input {
+    min-height: 3.5rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-body);
+    font-size: 0.9375rem;
+  }
+
+  .atc-specimens__sort .atc-button {
+    min-height: 3.5rem;
+  }
+
+  .atc-specimens__grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(72vw, 1fr);
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: clamp(1.25rem, 4vw, 3rem);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .atc-specimens__grid > .atc-card {
+    scroll-snap-align: start;
+  }
+
+  .atc-specimens__empty,
+  .atc-specimens__pagination p {
+    margin: 0;
+    font-family: var(--atc-font-body);
+  }
+
+  .atc-specimens__pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .atc-specimens__pagination .atc-button {
+    min-height: 2.75rem;
+    padding-inline: 1.25rem;
+  }
+
+  .atc-filter__value:focus-visible,
+  .atc-specimens select:focus-visible {
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+
+  @media (min-width: 750px) {
+    .atc-specimens__grid {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+  }
+
+  @media (min-width: 990px) {
+    .atc-specimens__toolbar {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .atc-specimens__sort-label {
+      width: auto;
+    }
+
+    .atc-specimens__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.specimens",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "t:atc.commerce.products_per_page",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.commerce.specimens"
+    }
+  ]
+}
+{% endschema %}

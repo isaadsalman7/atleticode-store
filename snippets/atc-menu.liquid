@@ -1,0 +1,58 @@
+{% doc %}
+  Renders one level of a navigation menu for the ATLETICODE header.
+
+  @param {object} menu - Linklist to render
+  @param {string} list_class - Class name for the list
+  @param {boolean} [show_children] - When true, render child links under each parent
+
+  @example
+  {% render 'atc-menu', menu: section.settings.menu, list_class: 'atc-header__list' %}
+{% enddoc %}
+
+{% if menu != blank %}
+  <ul class="{{ list_class }}">
+    {% for link in menu.links %}
+      <li
+        {% if show_children %}
+          {% if link.links != blank %}
+            class="atc-header__item--parent"
+          {% endif %}
+        {% endif %}
+      >
+        <a
+          href="{{ link.url }}"
+          class="atc-header__link{% if link.current %} is-current{% endif %}"
+          {% if link.current %}
+            aria-current="page"
+          {% endif %}
+          {% if show_children %}
+            {% if link.links != blank %}
+              aria-haspopup="true"
+            {% endif %}
+          {% endif %}
+        >
+          {{ link.title | escape }}
+        </a>
+        {% if show_children %}
+          {% if link.links != blank %}
+            <ul class="atc-header__children">
+              {% for child in link.links %}
+                <li>
+                  <a
+                    href="{{ child.url }}"
+                    class="atc-header__link{% if child.current %} is-current{% endif %}"
+                    {% if child.current %}
+                      aria-current="page"
+                    {% endif %}
+                  >
+                    {{ child.title | escape }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

@@ -1,0 +1,150 @@
+{% doc %}
+  Renders made-to-order, shipping-tier, and artwork-upload UI for a product.
+
+  Tier 1 is free worldwide shipping. Any other tier is calculated at checkout.
+  A product is tier 1 when `custom.shipping_tier` is tier-1, or when it is tagged `tier-1` or `shipping-tier-1`.
+  Artwork upload appears for `custom.artwork_upload`, or the tags `artwork-upload`, `custom-lab`, and `grid`.
+  Made to order is the store default unless `custom.made_to_order` is false or the product is tagged `ready-to-ship`.
+
+  @param {product} product - Product to describe
+  @param {string} part - Which fragment to render: card-badge, lead, shipping, or artwork
+
+  @example
+  {% render 'atc-fulfillment', product: product, part: 'lead' %}
+{% enddoc %}
+
+{% liquid
+  assign tier = product.metafields.custom.shipping_tier.value | downcase
+  if tier == blank
+    if product.tags contains 'tier-1'
+      assign tier = 'tier-1'
+    endif
+  endif
+  if tier == blank
+    if product.tags contains 'shipping-tier-1'
+      assign tier = 'tier-1'
+    endif
+  endif
+  if tier == 'tier_1'
+    assign tier = 'tier-1'
+  endif
+  if tier == '1'
+    assign tier = 'tier-1'
+  endif
+  if tier == 'free'
+    assign tier = 'tier-1'
+  endif
+
+  assign made_to_order = true
+  if product.metafields.custom.made_to_order.value == false
+    assign made_to_order = false
+  endif
+  if product.tags contains 'ready-to-ship'
+    assign made_to_order = false
+  endif
+
+  assign artwork = false
+  if product.metafields.custom.artwork_upload.value
+    assign artwork = true
+  endif
+  if product.tags contains 'artwork-upload'
+    assign artwork = true
+  endif
+  if product.tags contains 'custom-lab'
+    assign artwork = true
+  endif
+  if product.tags contains 'grid'
+    assign artwork = true
+  endif
+%}
+
+{% case part %}
+  {% when 'card-badge' %}
+    {% if made_to_order %}
+      <span class="atc-card__status atc-card__status--order">{{ 'atc.commerce.made_to_order' | t }}</span>
+    {% endif %}
+  {% when 'lead' %}
+    {% if made_to_order %}
+      <p class="atc-fulfillment__lead">{{ 'atc.commerce.made_to_order_lead' | t }}</p>
+    {% endif %}
+  {% when 'shipping' %}
+    <p class="atc-fulfillment__shipping">
+      {% if tier == 'tier-1' %}
+        {{ 'atc.commerce.shipping_tier_1' | t }}
+      {% else %}
+        {{ 'atc.commerce.shipping_tier_standard' | t }}
+      {% endif %}
+    </p>
+  {% when 'artwork' %}
+    {% if artwork %}
+      <label class="atc-fulfillment__artwork" for="AtcArtwork-{{ product.id }}">
+        <span>{{ 'atc.commerce.artwork_label' | t }}</span>
+        <input
+          id="AtcArtwork-{{ product.id }}"
+          type="file"
+          name="properties[Artwork]"
+          accept=".png,.pdf,.ai,.psd,image/png,application/pdf"
+        >
+        <span class="atc-fulfillment__hint">{{ 'atc.commerce.artwork_hint' | t }}</span>
+      </label>
+    {% endif %}
+{% endcase %}
+
+{% stylesheet %}
+  .atc-card__status--order {
+    top: auto;
+    bottom: 0.75rem;
+    background: var(--atc-bg-dark);
+    color: var(--atc-white);
+  }
+
+  .atc-fulfillment__lead,
+  .atc-fulfillment__shipping,
+  .atc-fulfillment__hint {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .atc-fulfillment__lead {
+    color: var(--atc-ink);
+  }
+
+  .atc-fulfillment__shipping,
+  .atc-fulfillment__hint {
+    color: var(--atc-muted);
+  }
+
+  .atc-fulfillment__artwork {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    width: min(100%, 24rem);
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .atc-fulfillment__artwork input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.6rem;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-body);
+    font-size: 0.875rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .atc-fulfillment__artwork input:focus-visible {
+    outline: var(--atc-focus);
+    outline-offset: 3px;
+  }
+{% endstylesheet %}

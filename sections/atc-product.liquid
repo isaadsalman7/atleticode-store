@@ -1,0 +1,525 @@
+{% liquid
+  assign current = product.selected_or_first_available_variant
+%}
+
+<section class="atc-product" data-atc-product>
+  <div class="atc-product__gallery">
+    {% for media in product.media %}
+      <figure class="atc-product__frame">
+        <span class="atc-product__figure">{{ 'atc.commerce.figure' | t: index: forloop.index }}</span>
+        {% case media.media_type %}
+          {% when 'image' %}
+            {% liquid
+              assign media_loading = 'lazy'
+              if forloop.first
+                assign media_loading = 'eager'
+              endif
+            %}
+            {{
+              media
+              | image_url: width: 1600
+              | image_tag:
+                widths: '400, 700, 1000, 1400, 1600',
+                sizes: '(min-width: 990px) 50vw, 100vw',
+                alt: media.alt,
+                loading: media_loading
+            }}
+          {% when 'video' %}
+            {{ media | video_tag: controls: true, class: 'atc-product__video' }}
+          {% when 'external_video' %}
+            {{ media | external_video_tag: class: 'atc-product__video' }}
+          {% else %}
+            {{ media | media_tag }}
+        {% endcase %}
+      </figure>
+    {% else %}
+      {% if request.design_mode %}
+        <p>{{ 'atc.home.add_media' | t }}</p>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div class="atc-product__buy">
+    {% if section.settings.show_vendor %}
+      {% if product.vendor != blank %}
+        <p class="atc-product__eyebrow">{{ product.vendor | escape }}</p>
+      {% endif %}
+    {% endif %}
+    <h1 class="atc-product__title">{{ product.title | escape }}</h1>
+    {% if product.metafields.custom.sub_line.value != blank %}
+      <p class="atc-product__line">{{ product.metafields.custom.sub_line.value | escape }}</p>
+    {% endif %}
+
+    {% for variant in product.variants %}
+      <div
+        class="atc-product__offer"
+        data-atc-variant-price="{{ variant.id }}"
+        {% unless variant.id == current.id %}
+          hidden
+        {% endunless %}
+      >
+        {% render 'atc-price', item: variant, badge: true %}
+        {% if variant.sku != blank %}
+          <p class="atc-product__sku">{{ 'atc.commerce.sku' | t: sku: variant.sku }}</p>
+        {% endif %}
+        <p class="atc-product__stock">
+          {% if variant.available %}
+            {% if variant.inventory_management %}
+              {% if variant.inventory_quantity > 0 %}
+                {% if variant.inventory_quantity <= 5 %}
+                  {{ 'atc.commerce.low_stock' | t: count: variant.inventory_quantity }}
+                {% else %}
+                  {{ 'atc.commerce.in_stock' | t }}
+                {% endif %}
+              {% else %}
+                {{ 'atc.commerce.in_stock' | t }}
+              {% endif %}
+            {% else %}
+              {{ 'atc.commerce.in_stock' | t }}
+            {% endif %}
+          {% else %}
+            {{ 'products.product.sold_out' | t }}
+          {% endif %}
+        </p>
+      </div>
+    {% endfor %}
+
+    {% render 'atc-fulfillment', product: product, part: 'lead' %}
+    {% render 'atc-fulfillment', product: product, part: 'shipping' %}
+
+    {% form 'product', product, class: 'atc-product__form' %}
+      <input type="hidden" name="id" value="{{ current.id }}">
+
+      {% unless product.has_only_default_variant %}
+        {% for option in product.options_with_values %}
+          <fieldset class="atc-option" data-atc-option>
+            <legend class="atc-option__legend">{{ option.name | escape }}</legend>
+            <div class="atc-option__values">
+              {% for value in option.values %}
+                <label class="atc-option__choice">
+                  <input
+                    class="atc-option__input"
+                    type="radio"
+                    name="option-{{ option.position }}"
+                    value="{{ value | escape }}"
+                    {% if value.selected %}
+                      checked
+                    {% endif %}
+                  >
+                  <span
+                    class="atc-option__chip{% if value.swatch.color or value.swatch.image %} atc-option__chip--swatch{% endif %}"
+                    {% if value.swatch.color %}
+                      style="--atc-swatch: rgb({{ value.swatch.color.rgb }});"
+                    {% elsif value.swatch.image %}
+                      style="--atc-swatch: url({{ value.swatch.image | image_url: width: 80 }});"
+                    {% endif %}
+                  >
+                    {% if value.swatch.color or value.swatch.image %}
+                      <span class="visually-hidden">{{ value.name | escape }}</span>
+                    {% else %}
+                      {{ value | escape }}
+                    {% endif %}
+                  </span>
+                </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+        {% endfor %}
+      {% endunless %}
+
+      <button
+        type="button"
+        class="atc-product__size-link"
+        data-atc-size-open
+        aria-controls="AtcSizeGuide"
+        aria-haspopup="dialog"
+      >
+        {{ 'atc.commerce.size_guide' | t }}
+      </button>
+
+      {% render 'atc-fulfillment', product: product, part: 'artwork' %}
+
+      <label class="atc-product__quantity" for="AtcQuantity-{{ section.id }}">
+        <span>{{ 'atc.commerce.quantity' | t }}</span>
+        <input
+          id="AtcQuantity-{{ section.id }}"
+          type="number"
+          name="quantity"
+          value="1"
+          min="1"
+          inputmode="numeric"
+        >
+      </label>
+
+      {{ form.errors | default_errors }}
+
+      <button
+        class="atc-button atc-product__add"
+        type="submit"
+        name="add"
+        data-atc-add
+        data-label-add="{{ 'products.product.add_to_cart' | t }}"
+        data-label-sold-out="{{ 'products.product.sold_out' | t }}"
+        {% unless current.available %}
+          disabled
+        {% endunless %}
+      >
+        {% if current.available %}
+          {{ 'products.product.add_to_cart' | t }}
+        {% else %}
+          {{ 'products.product.sold_out' | t }}
+        {% endif %}
+      </button>
+    {% endform %}
+
+    <script type="application/json" data-atc-variants>
+      {{ product.variants | json }}
+    </script>
+  </div>
+
+  {% liquid
+    assign spec_material = product.metafields.custom.material
+    assign spec_gsm = product.metafields.custom.gsm
+    assign spec_weight = product.metafields.custom.weight
+    assign spec_hydro = product.metafields.custom.hydrostatic_head
+    assign spec_drag = product.metafields.custom.drag_coefficient
+    assign spec_care = product.metafields.custom.care
+    assign show_specs = false
+    if spec_material != blank
+      assign show_specs = true
+    endif
+    if spec_gsm != blank
+      assign show_specs = true
+    endif
+    if spec_weight != blank
+      assign show_specs = true
+    endif
+    if spec_hydro != blank
+      assign show_specs = true
+    endif
+    if spec_drag != blank
+      assign show_specs = true
+    endif
+    if spec_care != blank
+      assign show_specs = true
+    endif
+  %}
+  {% if show_specs %}
+    <div class="atc-product__specs">
+      {% if spec_material != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_material' | t }}</summary>
+          {{ spec_material | metafield_tag }}
+        </details>
+      {% endif %}
+      {% if spec_gsm != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_gsm' | t }}</summary>
+          {{ spec_gsm | metafield_tag }}
+        </details>
+      {% endif %}
+      {% if spec_weight != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_weight' | t }}</summary>
+          {{ spec_weight | metafield_tag }}
+        </details>
+      {% endif %}
+      {% if spec_hydro != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_hydro' | t }}</summary>
+          {{ spec_hydro | metafield_tag }}
+        </details>
+      {% endif %}
+      {% if spec_drag != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_drag' | t }}</summary>
+          {{ spec_drag | metafield_tag }}
+        </details>
+      {% endif %}
+      {% if spec_care != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_care' | t }}</summary>
+          {{ spec_care | metafield_tag }}
+        </details>
+      {% endif %}
+    </div>
+  {% elsif request.design_mode %}
+    <p class="atc-product__specs-note">{{ 'atc.commerce.specs_empty' | t }}</p>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .atc-product {
+    display: grid;
+    gap: 2rem;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-product__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .atc-product__frame {
+    position: relative;
+    margin: 0;
+    background: #f3f3f3;
+  }
+
+  .atc-product__frame img,
+  .atc-product__frame video,
+  .atc-product__frame model-viewer {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .atc-product__figure {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 1;
+    padding: 0.3rem 0.4rem;
+    background: var(--atc-bg);
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .atc-product__buy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .atc-product__eyebrow,
+  .atc-product__line,
+  .atc-product__sku,
+  .atc-product__stock,
+  .atc-option__legend,
+  .atc-product__quantity span {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-product__title {
+    margin: 0;
+    font-family: var(--atc-font-display);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+    text-transform: uppercase;
+    overflow-wrap: break-word;
+  }
+
+  .atc-product__offer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .atc-product__form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .atc-option {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .atc-option__legend {
+    margin-bottom: 0.6rem;
+    padding: 0;
+  }
+
+  .atc-option__values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .atc-option__choice {
+    position: relative;
+  }
+
+  .atc-option__input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+  }
+
+  .atc-option__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--atc-line);
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .atc-option__input:checked + .atc-option__chip {
+    background: var(--atc-ink);
+    border-color: var(--atc-ink);
+    color: var(--atc-white);
+  }
+
+  .atc-option__chip--swatch {
+    background: var(--atc-swatch) center / cover no-repeat;
+  }
+
+  .atc-option__input:checked + .atc-option__chip--swatch {
+    background: var(--atc-swatch) center / cover no-repeat;
+    color: transparent;
+    box-shadow: inset 0 0 0 2px var(--atc-bg), inset 0 0 0 4px var(--atc-ink);
+  }
+
+  .atc-option__input:focus-visible + .atc-option__chip,
+  .atc-product__size-link:focus-visible,
+  .atc-product__quantity input:focus-visible {
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+
+  .atc-product__size-link {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--atc-ink);
+    background: transparent;
+    color: var(--atc-ink);
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .atc-product__quantity {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .atc-product__quantity input {
+    width: 5.5rem;
+    min-height: 3rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-body);
+    font-size: 1rem;
+  }
+
+  .atc-product__add {
+    width: min(100%, 24rem);
+  }
+
+  .atc-product__add:disabled {
+    background: var(--atc-muted);
+    border-color: var(--atc-muted);
+    color: var(--atc-white);
+    cursor: not-allowed;
+  }
+
+  .atc-product__specs {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--atc-line);
+  }
+
+  .atc-product__specs details {
+    border-bottom: 1px solid var(--atc-line);
+  }
+
+  .atc-product__specs summary {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    cursor: pointer;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .atc-product__specs summary:focus-visible {
+    outline: var(--atc-focus);
+    outline-offset: 3px;
+  }
+
+  .atc-product__specs .metafield-rich_text_field,
+  .atc-product__specs p {
+    margin: 0 0 1rem;
+    max-width: 42rem;
+  }
+
+  .atc-product__specs-note {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  @media (min-width: 990px) {
+    .atc-product {
+      grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+      align-items: start;
+      gap: 4rem;
+    }
+
+    .atc-product__buy {
+      position: sticky;
+      top: calc(var(--atc-header-height) + 1.5rem);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.product_page",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:atc.commerce.show_vendor",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "t:atc.commerce.fulfillment_info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.commerce.product_page"
+    }
+  ]
+}
+{% endschema %}

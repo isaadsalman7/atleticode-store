@@ -1,0 +1,18 @@
+{% doc %}
+  Renders one specification cell inside a protocol dossier.
+
+  @param {string} label - Specification name
+  @param {string} value - Specification value
+
+  @example
+  {% render 'atc-spec', label: 'Window', value: '30 days' %}
+{% enddoc %}
+
+{% if label != blank %}
+  {% if value != blank %}
+    <div class="atc-spec">
+      <p class="atc-spec__label">{{ label | escape }}</p>
+      <p class="atc-spec__value">{{ value | escape }}</p>
+    </div>
+  {% endif %}
+{% endif %}

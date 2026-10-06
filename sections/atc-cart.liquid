@@ -1,0 +1,312 @@
+<section class="atc-cart">
+  <header class="atc-cart__header">
+    <h1>{{ 'atc.commerce.cart' | t }}</h1>
+    <p>{{ 'atc.commerce.cart_count' | t: count: cart.item_count }}</p>
+  </header>
+
+  {% if cart.empty? %}
+    <div class="atc-cart__empty">
+      <p>{{ 'atc.commerce.cart_empty' | t }}</p>
+      <a class="atc-button" href="{{ routes.all_products_collection_url }}">
+        {{ 'atc.commerce.continue_shopping' | t }}
+      </a>
+    </div>
+  {% else %}
+    {% form 'cart', cart, class: 'atc-cart__form' %}
+      <div class="atc-cart__items">
+        {% for item in cart.items %}
+          <article class="atc-cart__item">
+            <a class="atc-cart__media" href="{{ item.url }}">
+              {% if item.image %}
+                {{
+                  item.image
+                  | image_url: width: 320
+                  | image_tag:
+                    widths: '120, 180, 320',
+                    sizes: '120px',
+                    alt: item.title,
+                    loading: 'lazy'
+                }}
+              {% endif %}
+            </a>
+            <div class="atc-cart__details">
+              <a class="atc-cart__title" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+              {% unless item.product.has_only_default_variant %}
+                <p class="atc-cart__variant">{{ item.variant.title | escape }}</p>
+              {% endunless %}
+              {% if item.sku != blank %}
+                <p class="atc-cart__meta">{{ 'atc.commerce.sku' | t: sku: item.sku }}</p>
+              {% endif %}
+              {% render 'atc-line-properties', item: item %}
+              {% for discount in item.line_level_discount_allocations %}
+                <p class="atc-cart__meta">{{ discount.discount_application.title | escape }}</p>
+              {% endfor %}
+              <label class="atc-cart__qty" for="AtcCartQty-{{ item.index | plus: 1 }}">
+                <span>{{ 'atc.commerce.quantity' | t }}</span>
+                <input
+                  id="AtcCartQty-{{ item.index | plus: 1 }}"
+                  type="number"
+                  name="updates[]"
+                  value="{{ item.quantity }}"
+                  min="0"
+                  inputmode="numeric"
+                  data-index="{{ item.index | plus: 1 }}"
+                >
+              </label>
+              <a class="atc-cart__remove" href="{{ item.url_to_remove }}">
+                {{ 'atc.commerce.remove' | t }}
+              </a>
+            </div>
+            <p class="atc-cart__line">
+              {% if item.original_line_price != item.final_line_price %}
+                <s>{{ item.original_line_price | money }}</s>
+              {% endif %}
+              {{ item.final_line_price | money }}
+            </p>
+          </article>
+        {% endfor %}
+      </div>
+
+      <aside class="atc-cart__summary">
+        {% if cart.cart_level_discount_applications.size > 0 %}
+          <ul class="atc-cart__discounts">
+            {% for discount in cart.cart_level_discount_applications %}
+              <li>
+                {{ discount.title | escape }}
+                <span>−{{ discount.total_allocated_amount | money }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <p class="atc-cart__total">
+          <span>{{ 'atc.commerce.subtotal' | t }}</span>
+          <span>{{ cart.total_price | money }}</span>
+        </p>
+        {% render 'atc-cart-drawer', show_files: false %}
+        <button class="atc-button" type="submit" name="checkout">
+          {{ 'atc.commerce.checkout' | t }}
+        </button>
+        <button class="atc-button atc-button--ghost" type="submit" name="update">
+          {{ 'atc.commerce.update' | t }}
+        </button>
+      </aside>
+    {% endform %}
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .atc-cart {
+    padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-cart__header h1,
+  .atc-cart__title,
+  .atc-cart__total {
+    font-family: var(--atc-font-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .atc-cart__header h1 {
+    margin: 0;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 0.92;
+  }
+
+  .atc-cart__header p,
+  .atc-cart__variant,
+  .atc-cart__meta,
+  .atc-cart__note,
+  .atc-cart__qty span {
+    margin: 0.75rem 0 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-cart__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .atc-cart__empty p {
+    margin: 0;
+    font-family: var(--atc-font-body);
+    font-size: 1.125rem;
+  }
+
+  .atc-cart__form {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2.5rem;
+  }
+
+  .atc-cart__item {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--atc-line);
+  }
+
+  .atc-cart__media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    background: #f3f3f3;
+  }
+
+  .atc-cart__details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .atc-cart__title {
+    color: inherit;
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+  }
+
+  .atc-cart__line {
+    grid-column: 2;
+    margin: 0;
+    font-family: var(--atc-font-body);
+    font-weight: 500;
+  }
+
+  .atc-cart__line s {
+    display: block;
+    color: var(--atc-muted);
+    font-weight: 400;
+  }
+
+  .atc-cart__qty {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+  }
+
+  .atc-cart__qty input {
+    width: 5rem;
+    min-height: 2.75rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-body);
+  }
+
+  .atc-cart__remove {
+    color: var(--atc-ink);
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .atc-cart__summary {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--atc-bg-dark);
+    color: var(--atc-white);
+  }
+
+  .atc-cart__summary .atc-button--ghost {
+    border-color: var(--atc-white);
+    color: var(--atc-white);
+  }
+
+  .atc-cart__summary .atc-button {
+    width: 100%;
+  }
+
+  .atc-cart__total {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0;
+    font-size: 1.125rem;
+  }
+
+  .atc-cart__discounts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .atc-cart__discounts li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .atc-cart__note {
+    color: #a3a3a3;
+  }
+
+  .atc-cart a:focus-visible,
+  .atc-cart input:focus-visible {
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+
+  .atc-cart__summary a:focus-visible,
+  .atc-cart__summary button:focus-visible {
+    outline-color: var(--atc-white);
+  }
+
+  @media (min-width: 990px) {
+    .atc-cart__form {
+      grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.6fr);
+      align-items: start;
+    }
+
+    .atc-cart__item {
+      grid-template-columns: 7rem minmax(0, 1fr) auto;
+    }
+
+    .atc-cart__line {
+      grid-column: auto;
+      text-align: right;
+    }
+
+    .atc-cart__summary {
+      position: sticky;
+      top: calc(var(--atc-header-height) + 1.5rem);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.cart",
+  "tag": "section",
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:atc.commerce.cart"
+    }
+  ]
+}
+{% endschema %}

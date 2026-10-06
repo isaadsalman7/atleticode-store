@@ -1,0 +1,169 @@
+<script
+  type="module"
+  src="{{ 'cart-icon.js' | asset_url }}"
+  fetchpriority="low"
+></script>
+
+<header
+  id="header-component"
+  class="atc-header"
+  data-atc-header
+>
+  <div class="atc-header__bar">
+    <a
+      class="atc-header__brand"
+      href="{{ routes.root_url }}"
+      aria-label="{{ 'accessibility.home_logo_alt' | t: store_name: shop.name }}"
+    >
+      {%- if section.settings.brand != blank -%}
+        {{ section.settings.brand | escape }}
+      {%- else -%}
+        {{ shop.name | escape }}
+      {%- endif -%}
+    </a>
+
+    <nav
+      class="atc-header__nav"
+      aria-label="{{ 'accessibility.header_navigation_label' | t }}"
+    >
+      {% render 'atc-menu', menu: section.settings.menu, list_class: 'atc-header__list', show_children: true %}
+    </nav>
+
+    <div class="atc-header__actions">
+      <button
+        type="button"
+        class="atc-header__action"
+        on:click="#search-modal/showDialog"
+        aria-haspopup="dialog"
+        aria-controls="search-modal"
+        aria-label="{{ 'atc.header.search' | t }}"
+      >
+        <span class="atc-header__search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75">
+            <circle cx="11" cy="11" r="6"></circle>
+            <path d="M16 16l5 5"></path>
+          </svg>
+        </span>
+        <span class="atc-header__search-label">{{ 'atc.header.search' | t }}</span>
+      </button>
+      <a
+        class="atc-header__action atc-header__shop"
+        href="{{ section.settings.shop_link | default: routes.all_products_collection_url }}"
+      >
+        {{ 'atc.header.shop' | t }}
+      </a>
+
+      {% if shop.customer_accounts_enabled %}
+        <div class="atc-account color-custom-popover">
+          <shopify-account>
+            {% if customer %}
+              <span class="atc-header__account-fallback" aria-hidden="true"></span>
+            {% else %}
+              <span class="atc-header__action" slot="signed-out-avatar">
+                {{ 'atc.header.account' | t }}
+              </span>
+            {% endif %}
+          </shopify-account>
+        </div>
+      {% endif %}
+
+      {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
+        <button
+          type="button"
+          class="atc-header__action atc-header__cart"
+          on:click="#cart-drawer/toggle"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="cart-drawer"
+          aria-label="{{ 'atc.header.cart_count' | t: count: cart.item_count }}"
+        >
+          <cart-icon class="atc-header__cart-icon" data-testid="cart-icon">
+            <span class="atc-header__action-label">{{ 'atc.header.cart' | t }}</span>
+            {% render 'cart-bubble', limit: 100 %}
+          </cart-icon>
+        </button>
+      {% else %}
+        <a
+          class="atc-header__action atc-header__cart"
+          href="{{ routes.cart_url }}"
+          aria-label="{{ 'atc.header.cart_count' | t: count: cart.item_count }}"
+        >
+          <cart-icon class="atc-header__cart-icon" data-testid="cart-icon">
+            <span class="atc-header__action-label">{{ 'atc.header.cart' | t }}</span>
+            {% render 'cart-bubble', limit: 100 %}
+          </cart-icon>
+        </a>
+      {% endif %}
+
+      <button
+        type="button"
+        class="atc-header__menu-toggle"
+        data-atc-menu-toggle
+        aria-expanded="false"
+        aria-controls="AtcNavDrawer"
+        aria-label="{{ 'atc.header.open_menu' | t }}"
+        data-open-label="{{ 'atc.header.open_menu' | t }}"
+        data-close-label="{{ 'atc.header.close_menu' | t }}"
+      >
+        <span class="atc-header__menu-icon" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <div
+    id="AtcNavDrawer"
+    class="atc-header__drawer"
+    data-atc-drawer
+    hidden
+  >
+    <nav aria-label="{{ 'accessibility.header_navigation_label' | t }}">
+      {% render 'atc-menu',
+        menu: section.settings.menu,
+        list_class: 'atc-header__drawer-list',
+        show_children: true
+      %}
+    </nav>
+  </div>
+
+  {% if request.design_mode %}
+    {% if section.settings.menu == blank %}
+      <p class="atc-header__editor-note">{{ 'atc.header.menu_missing' | t }}</p>
+    {% endif %}
+  {% endif %}
+</header>
+
+{% schema %}
+{
+  "name": "t:atc.header.name",
+  "tag": "div",
+  "class": "atc-header-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand",
+      "label": "t:atc.header.brand",
+      "default": "ATLETICODE"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:atc.header.menu",
+      "default": "main-menu",
+      "info": "t:atc.header.menu_info"
+    },
+    {
+      "type": "url",
+      "id": "shop_link",
+      "label": "t:atc.header.shop_link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.header.name"
+    }
+  ]
+}
+{% endschema %}

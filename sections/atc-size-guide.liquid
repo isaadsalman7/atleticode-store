@@ -1,0 +1,304 @@
+<dialog id="AtcSizeGuide" class="atc-size-guide" aria-labelledby="AtcSizeGuideTitle">
+  <div class="atc-size-guide__panel">
+    <div class="atc-size-guide__header">
+      <h2 id="AtcSizeGuideTitle">{{ section.settings.heading | escape }}</h2>
+      <form method="dialog">
+        <button class="atc-size-guide__close" type="submit" value="close">
+          {{ 'atc.commerce.close' | t }}
+        </button>
+      </form>
+    </div>
+    {% if section.settings.text != blank %}
+      <p class="atc-size-guide__text">{{ section.settings.text | escape }}</p>
+    {% endif %}
+    {% if section.blocks.size > 0 %}
+      <div class="atc-size-guide__tabs" role="tablist" aria-label="{{ 'atc.commerce.regions' | t }}">
+        <button type="button" role="tab" aria-selected="true" data-atc-region="us">{{ 'atc.commerce.region_us' | t }}</button>
+        <button type="button" role="tab" aria-selected="false" data-atc-region="uk">{{ 'atc.commerce.region_uk' | t }}</button>
+        <button type="button" role="tab" aria-selected="false" data-atc-region="eu">{{ 'atc.commerce.region_eu' | t }}</button>
+        <button type="button" role="tab" aria-selected="false" data-atc-region="aus">{{ 'atc.commerce.region_aus' | t }}</button>
+        <button type="button" role="tab" aria-selected="false" data-atc-region="metric">{{ 'atc.commerce.region_metric' | t }}</button>
+      </div>
+      <table class="atc-size-guide__table">
+        <caption class="visually-hidden">{{ section.settings.heading | escape }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ 'atc.commerce.size' | t }}</th>
+            <th scope="col">
+              <span data-atc-region-label="us">{{ 'atc.commerce.region_us' | t }}</span>
+              <span data-atc-region-label="uk" hidden>{{ 'atc.commerce.region_uk' | t }}</span>
+              <span data-atc-region-label="eu" hidden>{{ 'atc.commerce.region_eu' | t }}</span>
+              <span data-atc-region-label="aus" hidden>{{ 'atc.commerce.region_aus' | t }}</span>
+              <span data-atc-region-label="metric" hidden>{{ 'atc.commerce.region_metric' | t }}</span>
+            </th>
+            <th scope="col">
+              <span class="visually-hidden">{{ 'atc.commerce.select_size' | t }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for block in section.blocks %}
+            {% liquid
+              assign region_us = block.settings.us
+              if region_us == blank
+                assign region_us = block.settings.size
+              endif
+              assign region_metric = block.settings.metric
+              if region_metric == blank
+                assign region_metric = block.settings.measurement
+              endif
+            %}
+            <tr {{ block.shopify_attributes }}>
+              <th scope="row">{{ block.settings.size | escape }}</th>
+              <td data-atc-region-value="us">{{ region_us | escape }}</td>
+              <td data-atc-region-value="uk" hidden>
+                {% if block.settings.uk != blank %}
+                  {{ block.settings.uk | escape }}
+                {% else %}
+                  {{ 'atc.commerce.region_empty' | t }}
+                {% endif %}
+              </td>
+              <td data-atc-region-value="eu" hidden>
+                {% if block.settings.eu != blank %}
+                  {{ block.settings.eu | escape }}
+                {% else %}
+                  {{ 'atc.commerce.region_empty' | t }}
+                {% endif %}
+              </td>
+              <td data-atc-region-value="aus" hidden>
+                {% if block.settings.aus != blank %}
+                  {{ block.settings.aus | escape }}
+                {% else %}
+                  {{ 'atc.commerce.region_empty' | t }}
+                {% endif %}
+              </td>
+              <td data-atc-region-value="metric" hidden>
+                {% if region_metric != blank %}
+                  {{ region_metric | escape }}
+                {% else %}
+                  {{ 'atc.commerce.region_empty' | t }}
+                {% endif %}
+              </td>
+              <td>
+                {% if block.settings.size != blank %}
+                  <button
+                    type="button"
+                    class="atc-size-guide__select"
+                    data-atc-size-confirm
+                    data-size="{{ block.settings.size | escape }}"
+                  >
+                    {{ 'atc.commerce.select_size' | t }}
+                  </button>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% elsif request.design_mode %}
+      <p>{{ 'atc.commerce.add_sizes' | t }}</p>
+    {% endif %}
+  </div>
+</dialog>
+
+{% stylesheet %}
+  .atc-size-guide {
+    width: min(48rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    padding: 0;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-size-guide::backdrop {
+    background: rgb(10 10 10 / 72%);
+  }
+
+  .atc-size-guide__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    overflow-x: auto;
+  }
+
+  .atc-size-guide__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .atc-size-guide__header h2 {
+    margin: 0;
+    font-family: var(--atc-font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .atc-size-guide__close,
+  .atc-size-guide__select {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--atc-ink);
+    border-radius: 0;
+    background: transparent;
+    color: var(--atc-ink);
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .atc-size-guide__close:hover,
+  .atc-size-guide__select:hover,
+  .atc-size-guide__close:focus-visible,
+  .atc-size-guide__select:focus-visible {
+    background: var(--atc-ink);
+    color: var(--atc-white);
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+
+  .atc-size-guide__text {
+    margin: 0;
+    font-family: var(--atc-font-body);
+    line-height: 1.6;
+  }
+
+  .atc-size-guide__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .atc-size-guide__tabs button {
+    min-height: 2.75rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--atc-line);
+    border-radius: 0;
+    background: transparent;
+    color: var(--atc-ink);
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .atc-size-guide__tabs button[aria-selected='true'] {
+    background: var(--atc-ink);
+    border-color: var(--atc-ink);
+    color: var(--atc-white);
+  }
+
+  .atc-size-guide__tabs button:focus-visible {
+    outline: var(--atc-focus);
+    outline-offset: 3px;
+  }
+
+  .atc-size-guide__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--atc-font-body);
+  }
+
+  .atc-size-guide__table th,
+  .atc-size-guide__table td {
+    padding: 0.75rem 0.4rem;
+    border-bottom: 1px solid var(--atc-line);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .atc-size-guide__table thead th {
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.size_guide",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "Precision sizing"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "t:atc.home.text",
+      "default": "Compare US, UK, EU, AUS, and metric measurements, then select a size."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "t:atc.commerce.size_row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "size",
+          "label": "t:atc.commerce.size",
+          "default": "M"
+        },
+        {
+          "type": "text",
+          "id": "measurement",
+          "label": "t:atc.commerce.measurement",
+          "info": "t:atc.commerce.metric_info",
+          "default": "Chest 96–100 cm"
+        },
+        {
+          "type": "text",
+          "id": "us",
+          "label": "t:atc.commerce.region_us",
+          "default": "M"
+        },
+        {
+          "type": "text",
+          "id": "uk",
+          "label": "t:atc.commerce.region_uk",
+          "default": "10"
+        },
+        {
+          "type": "text",
+          "id": "eu",
+          "label": "t:atc.commerce.region_eu",
+          "default": "46"
+        },
+        {
+          "type": "text",
+          "id": "aus",
+          "label": "t:atc.commerce.region_aus",
+          "default": "10"
+        },
+        {
+          "type": "text",
+          "id": "metric",
+          "label": "t:atc.commerce.region_metric",
+          "default": "96–100 cm"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.commerce.size_guide"
+    }
+  ]
+}
+{% endschema %}

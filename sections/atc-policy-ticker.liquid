@@ -1,0 +1,112 @@
+<section class="atc-ticker" aria-label="{{ 'atc.policies.ticker_label' | t }}">
+  {% if section.blocks.size > 0 %}
+    <div class="atc-ticker__viewport">
+      <div class="atc-ticker__track">
+        {% for block in section.blocks %}
+          <p class="atc-ticker__item" {{ block.shopify_attributes }}>
+            {{ block.settings.text | escape }}
+          </p>
+        {% endfor %}
+        <div class="atc-ticker__repeat" aria-hidden="true">
+          {% for block in section.blocks %}
+            <p class="atc-ticker__item">{{ block.settings.text | escape }}</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% elsif request.design_mode %}
+    <p class="atc-ticker__item">{{ 'atc.policies.add_ticker' | t }}</p>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .atc-ticker {
+    overflow: hidden;
+    background: var(--atc-bg-dark);
+    color: var(--atc-white);
+  }
+
+  .atc-ticker__track,
+  .atc-ticker__repeat {
+    display: flex;
+    align-items: center;
+    width: max-content;
+  }
+
+  .atc-ticker__track {
+    animation: atc-ticker 42s linear infinite;
+  }
+
+  .atc-ticker:hover .atc-ticker__track,
+  .atc-ticker:focus-within .atc-ticker__track {
+    animation-play-state: paused;
+  }
+
+  .atc-ticker__item {
+    margin: 0;
+    padding: 0.85rem 1.5rem;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .atc-ticker__item::before {
+    content: "●";
+    margin-right: 1.5rem;
+    color: var(--atc-cyan);
+  }
+
+  @keyframes atc-ticker {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .atc-ticker__viewport {
+      overflow-x: auto;
+    }
+
+    .atc-ticker__track {
+      animation: none;
+    }
+
+    .atc-ticker__repeat {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.policies.ticker",
+  "tag": "section",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "status",
+      "name": "t:atc.policies.status",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:atc.home.text",
+          "default": "System telemetry // real-time lab"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.policies.ticker"
+    }
+  ]
+}
+{% endschema %}

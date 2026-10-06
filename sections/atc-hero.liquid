@@ -1,0 +1,225 @@
+<section class="atc-hero">
+  <div class="atc-hero__copy">
+    {% if section.settings.heading != blank %}
+      <h1 class="atc-hero__heading">{{ section.settings.heading | escape | newline_to_br }}</h1>
+    {% endif %}
+    {% if section.settings.text != blank %}
+      <p class="atc-hero__text">{{ section.settings.text | escape }}</p>
+    {% endif %}
+    {% if section.blocks.size > 0 %}
+      <div class="atc-hero__actions">
+        {% for block in section.blocks %}
+          {% if block.type == 'button' %}
+            {% if block.settings.label != blank %}
+              {% if block.settings.link != blank %}
+                <a
+                  class="atc-button{% if block.settings.style == 'ghost' %} atc-button--ghost{% endif %}"
+                  href="{{ block.settings.link }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {{ block.settings.label | escape }}
+                </a>
+              {% else %}
+                <span
+                  class="atc-button{% if block.settings.style == 'ghost' %} atc-button--ghost{% endif %}"
+                  {{ block.shopify_attributes }}
+                >
+                  {{ block.settings.label | escape }}
+                </span>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="atc-hero__media-frame">
+    {% if section.settings.video != blank %}
+      {{
+        section.settings.video
+        | video_tag:
+          autoplay: true,
+          loop: true,
+          muted: true,
+          controls: false,
+          class: 'atc-hero__media'
+      }}
+    {% elsif section.settings.image != blank %}
+      {{
+        section.settings.image
+        | image_url: width: 2000
+        | image_tag:
+          class: 'atc-hero__media',
+          widths: '600, 900, 1200, 1600, 2000',
+          sizes: '(min-width: 990px) 50vw, 100vw',
+          alt: section.settings.image.alt,
+          loading: 'eager',
+          fetchpriority: 'high'
+      }}
+    {% elsif request.design_mode %}
+      <p class="atc-hero__placeholder">{{ 'atc.home.add_media' | t }}</p>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .atc-hero {
+    display: grid;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-hero__copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.75rem;
+    padding: 3.5rem clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .atc-hero__heading {
+    margin: 0;
+    max-width: 12em;
+    font-family: var(--atc-font-display);
+    font-size: clamp(3.25rem, 7vw, 6.5rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+
+  .atc-hero__text {
+    max-width: 34rem;
+    margin: 0;
+    font-family: var(--atc-font-body);
+    font-size: 1.0625rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #3f3f46;
+  }
+
+  .atc-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .atc-hero__media-frame {
+    position: relative;
+    min-height: 22rem;
+    background: var(--atc-bg-dark);
+    overflow: hidden;
+  }
+
+  .atc-hero__media,
+  .atc-hero__media-frame img,
+  .atc-hero__media-frame video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .atc-hero__media-frame img,
+  .atc-hero__media-frame video,
+  .atc-hero__media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .atc-hero__placeholder {
+    margin: 0;
+    padding: 2rem;
+    color: #a3a3a3;
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 990px) {
+    .atc-hero {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      min-height: calc(100svh - var(--atc-header-height));
+    }
+
+    .atc-hero__media-frame {
+      min-height: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.home.hero",
+  "tag": "div",
+  "class": "atc-hero-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "Control\nthe game"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "t:atc.home.text",
+      "default": "Engineered for the 0.01%. Our laboratory-tested performance gear utilizes kinetic mapping and advanced polymer integration to maximize every movement."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:atc.home.image"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:atc.home.video"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "button",
+      "name": "t:atc.home.button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "t:atc.home.button_label",
+          "default": "Shop collection"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:atc.home.button_link"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "t:atc.home.button_style",
+          "default": "solid",
+          "options": [
+            { "value": "solid", "label": "t:atc.home.style_solid" },
+            { "value": "ghost", "label": "t:atc.home.style_outline" }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:atc.home.hero",
+      "blocks": [
+        { "type": "button", "settings": { "label": "Shop collection", "style": "solid" } },
+        { "type": "button", "settings": { "label": "View labs", "style": "ghost" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

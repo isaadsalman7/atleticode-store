@@ -1,0 +1,227 @@
+{% doc %}
+  Renders a laboratory product card from a Shopify product.
+
+  @param {object} product - Product to display
+  @param {string} [sizes] - Responsive image sizes attribute
+  @param {number} [specimen_index] - Position of this specimen in a collection list
+  @param {number} [specimen_total] - Total specimens represented by the list
+
+  @example
+  {% render 'atc-product-card', product: product, sizes: '(min-width: 990px) 25vw, 72vw' %}
+{% enddoc %}
+
+{% liquid
+  assign card_sizes = sizes | default: '(min-width: 990px) 25vw, 72vw'
+  assign primary_image = product.featured_image
+  assign secondary_image = product.images[1]
+  assign image_alt = ''
+  if primary_image.alt != blank
+    if primary_image.alt != product.title
+      assign image_alt = primary_image.alt
+    endif
+  endif
+%}
+
+<a class="atc-card" href="{{ product.url }}">
+  <div class="atc-card__media">
+    {% if primary_image != blank %}
+      {{
+        primary_image
+        | image_url: width: 900
+        | image_tag:
+          class: 'atc-card__image atc-card__image--primary',
+          widths: '300, 450, 600, 900',
+          sizes: card_sizes,
+          alt: image_alt,
+          loading: 'lazy'
+      }}
+    {% endif %}
+    {% if secondary_image != blank %}
+      {{
+        secondary_image
+        | image_url: width: 900
+        | image_tag:
+          class: 'atc-card__image atc-card__image--secondary',
+          widths: '300, 450, 600, 900',
+          sizes: card_sizes,
+          alt: '',
+          loading: 'lazy'
+      }}
+    {% endif %}
+    {% unless product.available %}
+      <span class="atc-card__status atc-card__status--sold-out">{{ 'products.product.sold_out' | t }}</span>
+    {% else %}
+      {% if product.compare_at_price > product.price %}
+        <span class="atc-card__status">{{ 'atc.commerce.sale' | t }}</span>
+      {% endif %}
+    {% endunless %}
+    {% render 'atc-fulfillment', product: product, part: 'card-badge' %}
+  </div>
+  {% if specimen_index %}
+    <p class="atc-card__specimen">
+      {{ 'atc.commerce.specimen' | t: index: specimen_index, total: specimen_total }}
+    </p>
+  {% endif %}
+  <div class="atc-card__row">
+    <span class="atc-card__title">{{ product.title | escape }}</span>
+    {% render 'atc-price', item: product %}
+  </div>
+  {% liquid
+    assign card_sku = product.selected_or_first_available_variant.sku
+    assign card_line = product.metafields.custom.sub_line.value
+  %}
+  {% if card_sku != blank %}
+    <p class="atc-card__meta">
+      {{ card_sku | escape }}
+      {% if card_line != blank %}
+        <span aria-hidden="true"> | </span>{{ card_line | escape }}
+      {% endif %}
+    </p>
+  {% else %}
+    {% if card_line != blank %}
+      <p class="atc-card__meta">{{ card_line | escape }}</p>
+    {% endif %}
+  {% endif %}
+  {% unless product.has_only_default_variant %}
+    {% if product.available %}
+      {% assign available_variants = product.variants | where: 'available', true %}
+      {% if available_variants.size < product.variants.size %}
+        <p class="atc-card__availability">
+          {{
+            'atc.commerce.variants_available'
+            | t: count: available_variants.size, total: product.variants.size
+          }}
+        </p>
+      {% endif %}
+    {% endif %}
+  {% endunless %}
+</a>
+
+{% stylesheet %}
+  .atc-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    color: var(--atc-ink);
+    text-decoration: none;
+    background: var(--atc-bg);
+  }
+
+  .atc-card__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: #f3f3f3;
+  }
+
+  .atc-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .atc-card__image--secondary {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .atc-card:hover .atc-card__image--secondary,
+  .atc-card:focus-visible .atc-card__image--secondary {
+    opacity: 1;
+  }
+
+  .atc-card:hover .atc-card__image--primary,
+  .atc-card:focus-visible .atc-card__image--primary {
+    opacity: 0;
+  }
+
+  .atc-card:not(:has(.atc-card__image--secondary)):hover .atc-card__image--primary,
+  .atc-card:not(:has(.atc-card__image--secondary)):focus-visible .atc-card__image--primary {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  .atc-card__status {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.3rem 0.4rem;
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .atc-card__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .atc-card__status--sold-out {
+    background: var(--atc-ink);
+    color: var(--atc-white);
+  }
+
+  .atc-card__specimen {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-card__title {
+    font-family: var(--atc-font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .atc-card__price {
+    flex-shrink: 0;
+    font-family: var(--atc-font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-align: right;
+  }
+
+  .atc-card__compare {
+    display: block;
+    color: var(--atc-muted);
+    font-weight: 400;
+    text-decoration: line-through;
+  }
+
+  .atc-card__availability {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-card__meta {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-card:focus-visible {
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+{% endstylesheet %}

@@ -1,0 +1,37 @@
+{% doc %}
+  Renders a square line icon for editorial bands.
+
+  @param {string} icon - chart, layers, athlete, or globe
+
+  @example
+  {% render 'atc-icon', icon: 'chart' %}
+{% enddoc %}
+
+<svg class="atc-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+  {% case icon %}
+    {% when 'layers' %}
+      <path d="M4 12 16 6l12 6-12 6L4 12Z" />
+      <path d="M8 16.5 16 20.5 24 16.5" />
+      <path d="M8 21 16 25l8-4" />
+    {% when 'athlete' %}
+      <circle cx="16" cy="7" r="3" />
+      <path d="M8 28v-6l4-4 4 3 4-6 4 4v9" />
+    {% when 'globe' %}
+      <circle cx="16" cy="16" r="10" />
+      <path d="M6 16h20M16 6c3 3.2 3 16.8 0 20M16 6c-3 3.2-3 16.8 0 20" />
+    {% else %}
+      <path d="M6 22V12M12 22V8M18 22v-6M24 22V10" />
+  {% endcase %}
+</svg>
+
+{% stylesheet %}
+  .atc-icon {
+    width: 2rem;
+    height: 2rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linejoin: square;
+    stroke-linecap: square;
+  }
+{% endstylesheet %}

@@ -1,0 +1,184 @@
+<section class="atc-lookbook">
+  <div class="atc-lookbook__intro">
+    {% if section.settings.eyebrow != blank %}
+      <p class="atc-lookbook__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {% endif %}
+    {% if section.settings.heading != blank %}
+      <h2 class="atc-lookbook__heading">{{ section.settings.heading | escape | newline_to_br }}</h2>
+    {% endif %}
+  </div>
+
+  {% if section.blocks.size > 0 %}
+    <div class="atc-lookbook__grid">
+      {% for block in section.blocks %}
+        {% liquid
+          assign look_image = block.settings.image
+          assign look_product = block.settings.product
+          assign look_url = ''
+          assign look_title = block.settings.caption
+          if look_product != blank
+            assign look_url = look_product.url
+            if look_image == blank
+              assign look_image = look_product.featured_image
+            endif
+            if look_title == blank
+              assign look_title = look_product.title
+            endif
+          endif
+        %}
+        {% if look_url != blank %}
+          <a class="atc-lookbook__item" href="{{ look_url }}" {{ block.shopify_attributes }}>
+        {% else %}
+          <figure class="atc-lookbook__item" {{ block.shopify_attributes }}>
+        {% endif %}
+          {% if look_image != blank %}
+            {{
+              look_image
+              | image_url: width: 1400
+              | image_tag:
+                class: 'atc-lookbook__image',
+                widths: '400, 700, 1000, 1400',
+                sizes: '(min-width: 990px) 33vw, 100vw',
+                alt: look_title,
+                loading: 'lazy'
+            }}
+          {% endif %}
+          {% if look_title != blank %}
+            <figcaption class="atc-lookbook__caption">{{ look_title | escape }}</figcaption>
+          {% endif %}
+        {% if look_url != blank %}
+          </a>
+        {% else %}
+          </figure>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% elsif request.design_mode %}
+    <p class="atc-lookbook__empty">{{ 'atc.commerce.add_looks' | t }}</p>
+  {% endif %}
+</section>
+
+{% stylesheet %}
+  .atc-lookbook {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+    background: var(--atc-bg);
+    color: var(--atc-ink);
+  }
+
+  .atc-lookbook__eyebrow {
+    margin: 0;
+    font-family: var(--atc-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--atc-muted);
+  }
+
+  .atc-lookbook__heading {
+    margin: 0.5rem 0 0;
+    font-family: var(--atc-font-display);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .atc-lookbook__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .atc-lookbook__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .atc-lookbook__image {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    background: #f3f3f3;
+  }
+
+  .atc-lookbook__caption {
+    font-family: var(--atc-font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .atc-lookbook__item:focus-visible {
+    outline: 2px solid var(--atc-ink);
+    outline-offset: 3px;
+  }
+
+  .atc-lookbook__empty {
+    margin: 0;
+    color: var(--atc-muted);
+  }
+
+  @media (min-width: 750px) {
+    .atc-lookbook__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:atc.commerce.lookbook",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:atc.home.eyebrow",
+      "default": "Lookbook"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "t:atc.home.heading",
+      "default": "Field studies"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "look",
+      "name": "t:atc.commerce.look",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:atc.home.image"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "t:atc.commerce.product"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "t:atc.commerce.caption"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "t:atc.commerce.lookbook"
+    }
+  ]
+}
+{% endschema %}
