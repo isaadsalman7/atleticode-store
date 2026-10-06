@@ -1,0 +1,142 @@
+{% doc %}
+  Resolves the branded series name for a product.
+
+  Uses `custom.sub_line` when present. Otherwise maps the catalog collection name and tags to VELOCITY, TITAN, GRID, PULSE, FOCUS, FORGE, or CUSTOM LAB.
+
+  @param {product} product - Product to describe
+
+  @example
+  {% render 'atc-catalog-series', product: product %}
+{% enddoc %}
+
+{% liquid
+  assign catalog_key = product.type | downcase
+  assign catalog_tags = product.tags | join: ',' | downcase
+  assign series_custom = product.metafields.custom.sub_line.value
+  assign series_key = ''
+  if series_custom != blank
+    assign series_key = 'custom'
+  endif
+  if series_key == blank
+    if catalog_tags contains 'velocity'
+      assign series_key = 'velocity'
+    endif
+  endif
+  if series_key == blank
+    if catalog_key == 'performance apparel'
+      assign series_key = 'velocity'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'performance-apparel'
+      assign series_key = 'velocity'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'titan'
+      assign series_key = 'titan'
+    endif
+  endif
+  if series_key == blank
+    if catalog_key == 'performance gloves'
+      assign series_key = 'titan'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'performance-gloves'
+      assign series_key = 'titan'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'grid'
+      assign series_key = 'grid'
+    endif
+  endif
+  if series_key == blank
+    if catalog_key == 'motorsport'
+      assign series_key = 'grid'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'motorsport'
+      assign series_key = 'grid'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'pulse'
+      assign series_key = 'pulse'
+    endif
+  endif
+  if series_key == blank
+    if catalog_key == 'team sports'
+      assign series_key = 'pulse'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'team-sports'
+      assign series_key = 'pulse'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'focus'
+      assign series_key = 'focus'
+    endif
+  endif
+  if series_key == blank
+    if catalog_key == 'precision sports'
+      assign series_key = 'focus'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'precision-sports'
+      assign series_key = 'focus'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'forge'
+      assign series_key = 'forge'
+    endif
+  endif
+  if series_key == blank
+    if catalog_key == 'accessories'
+      assign series_key = 'forge'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'accessories'
+      assign series_key = 'forge'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'custom-lab'
+      assign series_key = 'custom-lab'
+    endif
+  endif
+  if series_key == blank
+    if catalog_key == 'custom teamwear'
+      assign series_key = 'custom-lab'
+    endif
+  endif
+  if series_key == blank
+    if catalog_tags contains 'custom-teamwear'
+      assign series_key = 'custom-lab'
+    endif
+  endif
+%}
+{%- if series_key == 'custom' -%}
+  {{- series_custom -}}
+{%- elsif series_key == 'velocity' -%}
+  {{- 'atc.commerce.series_velocity' | t -}}
+{%- elsif series_key == 'titan' -%}
+  {{- 'atc.commerce.series_titan' | t -}}
+{%- elsif series_key == 'grid' -%}
+  {{- 'atc.commerce.series_grid' | t -}}
+{%- elsif series_key == 'pulse' -%}
+  {{- 'atc.commerce.series_pulse' | t -}}
+{%- elsif series_key == 'focus' -%}
+  {{- 'atc.commerce.series_focus' | t -}}
+{%- elsif series_key == 'forge' -%}
+  {{- 'atc.commerce.series_forge' | t -}}
+{%- elsif series_key == 'custom-lab' -%}
+  {{- 'atc.commerce.series_custom_lab' | t -}}
+{%- endif -%}

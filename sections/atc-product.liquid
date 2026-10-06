@@ -46,8 +46,12 @@
       {% endif %}
     {% endif %}
     <h1 class="atc-product__title">{{ product.title | escape }}</h1>
-    {% if product.metafields.custom.sub_line.value != blank %}
-      <p class="atc-product__line">{{ product.metafields.custom.sub_line.value | escape }}</p>
+    {% capture product_line %}
+      {%- render 'atc-fulfillment', product: product, part: 'subline' -%}
+    {% endcapture %}
+    {% assign product_line = product_line | strip %}
+    {% if product_line != blank %}
+      <p class="atc-product__line">{{ product_line | escape }}</p>
     {% endif %}
 
     {% for variant in product.variants %}
@@ -181,11 +185,19 @@
     assign spec_material = product.metafields.custom.material
     assign spec_gsm = product.metafields.custom.gsm
     assign spec_weight = product.metafields.custom.weight
+    assign spec_dimensions = product.metafields.custom.dimensions
+    assign spec_gender = product.metafields.custom.gender
     assign spec_hydro = product.metafields.custom.hydrostatic_head
     assign spec_drag = product.metafields.custom.drag_coefficient
     assign spec_care = product.metafields.custom.care
     assign show_specs = false
     if spec_material != blank
+      assign show_specs = true
+    endif
+    if spec_dimensions != blank
+      assign show_specs = true
+    endif
+    if spec_gender != blank
       assign show_specs = true
     endif
     if spec_gsm != blank
@@ -222,6 +234,18 @@
         <details>
           <summary>{{ 'atc.commerce.spec_weight' | t }}</summary>
           {{ spec_weight | metafield_tag }}
+        </details>
+      {% endif %}
+      {% if spec_dimensions != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_dimensions' | t }}</summary>
+          {{ spec_dimensions | metafield_tag }}
+        </details>
+      {% endif %}
+      {% if spec_gender != blank %}
+        <details>
+          <summary>{{ 'atc.commerce.spec_gender' | t }}</summary>
+          {{ spec_gender | metafield_tag }}
         </details>
       {% endif %}
       {% if spec_hydro != blank %}

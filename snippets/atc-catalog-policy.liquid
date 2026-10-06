@@ -1,0 +1,200 @@
+{% doc %}
+  Resolves the catalog shipping policy for a product.
+
+  Reads `custom.shipping_policy`, then product type and tags.
+  Known policies are Free Worldwide, Flat $12 / Free over $150, Flat $15, Flat $10, and Calculated at checkout.
+
+  @param {product} product - Product to describe
+  @param {string} part - `key` returns the policy token. `message` returns the storefront sentence.
+
+  @example
+  {% render 'atc-catalog-policy', product: product, part: 'message' %}
+{% enddoc %}
+
+{% liquid
+assign policy_label = product.metafields.custom.shipping_policy.value | strip
+  assign policy_key = ''
+  if policy_label == 'Free Worldwide'
+    assign policy_key = 'free'
+  endif
+  if policy_key == blank
+    if policy_label == 'Flat $12 / Free over $150'
+      assign policy_key = 'flat-12'
+    endif
+  endif
+  if policy_key == blank
+    if policy_label == 'Flat $15'
+      assign policy_key = 'flat-15'
+    endif
+  endif
+  if policy_key == blank
+    if policy_label == 'Flat $10'
+      assign policy_key = 'flat-10'
+    endif
+  endif
+  if policy_key == blank
+    if policy_label == 'Calculated at checkout'
+      assign policy_key = 'calculated'
+    endif
+  endif
+
+  assign legacy_tier = product.metafields.custom.shipping_tier.value | downcase
+  if policy_key == blank
+    if legacy_tier == 'tier-1'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if legacy_tier == 'tier_1'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if legacy_tier == '1'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if legacy_tier == 'free'
+      assign policy_key = 'free'
+    endif
+  endif
+
+  assign catalog_key = product.type | downcase
+  assign catalog_tags = product.tags | join: ',' | downcase
+
+  if policy_key == blank
+    if catalog_tags contains 'free-worldwide'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'tier-1'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'shipping-tier-1'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'flat-12'
+      assign policy_key = 'flat-12'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'flat-15'
+      assign policy_key = 'flat-15'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'flat-10'
+      assign policy_key = 'flat-10'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'shipping-calculated'
+      assign policy_key = 'calculated'
+    endif
+  endif
+
+  if policy_key == blank
+    if catalog_key == 'motorsport'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_key == 'precision sports'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'motorsport'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'precision-sports'
+      assign policy_key = 'free'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_key == 'performance apparel'
+      assign policy_key = 'flat-12'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'performance-apparel'
+      assign policy_key = 'flat-12'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_key == 'performance gloves'
+      assign policy_key = 'flat-15'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_key == 'team sports'
+      assign policy_key = 'flat-15'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'performance-gloves'
+      assign policy_key = 'flat-15'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'team-sports'
+      assign policy_key = 'flat-15'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_key == 'accessories'
+      assign policy_key = 'flat-10'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'accessories'
+      assign policy_key = 'flat-10'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_key == 'custom teamwear'
+      assign policy_key = 'calculated'
+    endif
+  endif
+  if policy_key == blank
+    if catalog_tags contains 'custom-teamwear'
+      assign policy_key = 'calculated'
+    endif
+  endif
+  if policy_key == blank
+    if policy_label != blank
+      assign policy_key = 'custom'
+    endif
+  endif
+  if policy_key == blank
+    assign policy_key = 'calculated'
+  endif
+%}
+
+{% if part == 'key' %}
+  {{- policy_key -}}
+{% elsif part == 'message' %}
+  <p class="atc-fulfillment__shipping">
+    {% if policy_key == 'free' %}
+      {{ 'atc.commerce.shipping_tier_1' | t }}
+    {% elsif policy_key == 'flat-12' %}
+      {{ 'atc.commerce.shipping_flat_12' | t }}
+    {% elsif policy_key == 'flat-15' %}
+      {{ 'atc.commerce.shipping_flat_15' | t }}
+    {% elsif policy_key == 'flat-10' %}
+      {{ 'atc.commerce.shipping_flat_10' | t }}
+    {% elsif policy_key == 'custom' %}
+      {{ policy_label | escape }}
+    {% else %}
+      {{ 'atc.commerce.shipping_calculated' | t }}
+    {% endif %}
+  </p>
+{% endif %}

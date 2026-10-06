@@ -38,6 +38,7 @@
                 <p class="atc-cart__meta">{{ 'atc.commerce.sku' | t: sku: item.sku }}</p>
               {% endif %}
               {% render 'atc-line-properties', item: item %}
+              {% render 'atc-fulfillment', product: item.product, part: 'shipping' %}
               {% for discount in item.line_level_discount_allocations %}
                 <p class="atc-cart__meta">{{ discount.discount_application.title | escape }}</p>
               {% endfor %}

@@ -1,41 +1,20 @@
 {% doc %}
-  Renders made-to-order, shipping-tier, and artwork-upload UI for a product.
+  Renders made-to-order, shipping-policy, series, and artwork-upload UI for a product.
 
-  Tier 1 is free worldwide shipping. Any other tier is calculated at checkout.
-  A product is tier 1 when `custom.shipping_tier` is tier-1, or when it is tagged `tier-1` or `shipping-tier-1`.
-  Artwork upload appears for `custom.artwork_upload`, or the tags `artwork-upload`, `custom-lab`, and `grid`.
-  Made to order is the store default unless `custom.made_to_order` is false or the product is tagged `ready-to-ship`.
+  Shipping and series names come from the catalog snippets.
+  Artwork upload follows `custom.custom_upload` = Yes, and otherwise Motorsport and Custom Teamwear.
 
   @param {product} product - Product to describe
-  @param {string} part - Which fragment to render: card-badge, lead, shipping, or artwork
+  @param {string} part - Fragment to render: card-badge, lead, shipping, artwork, subline, or policy-key
 
   @example
   {% render 'atc-fulfillment', product: product, part: 'lead' %}
 {% enddoc %}
 
 {% liquid
-  assign tier = product.metafields.custom.shipping_tier.value | downcase
-  if tier == blank
-    if product.tags contains 'tier-1'
-      assign tier = 'tier-1'
-    endif
-  endif
-  if tier == blank
-    if product.tags contains 'shipping-tier-1'
-      assign tier = 'tier-1'
-    endif
-  endif
-  if tier == 'tier_1'
-    assign tier = 'tier-1'
-  endif
-  if tier == '1'
-    assign tier = 'tier-1'
-  endif
-  if tier == 'free'
-    assign tier = 'tier-1'
-  endif
-
-  assign made_to_order = true
+  assign catalog_key = product.type | downcase
+  assign catalog_tags = product.tags | join: ',' | downcase
+assign made_to_order = true
   if product.metafields.custom.made_to_order.value == false
     assign made_to_order = false
   endif
@@ -43,38 +22,97 @@
     assign made_to_order = false
   endif
 
+  assign upload_raw = product.metafields.custom.custom_upload.value
+  assign upload_text = upload_raw | downcase
   assign artwork = false
-  if product.metafields.custom.artwork_upload.value
+  assign upload_known = false
+  if upload_raw == true
     assign artwork = true
+    assign upload_known = true
   endif
-  if product.tags contains 'artwork-upload'
+  if upload_text == 'yes'
     assign artwork = true
+    assign upload_known = true
   endif
-  if product.tags contains 'custom-lab'
-    assign artwork = true
+  if upload_raw == false
+    assign artwork = false
+    assign upload_known = true
   endif
-  if product.tags contains 'grid'
-    assign artwork = true
+  if upload_text == 'no'
+    assign artwork = false
+    assign upload_known = true
   endif
+  if upload_known == false
+    if product.metafields.custom.artwork_upload.value
+      assign artwork = true
+      assign upload_known = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_key == 'motorsport'
+      assign artwork = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_key == 'custom teamwear'
+      assign artwork = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_tags contains 'custom-upload'
+      assign artwork = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_tags contains 'artwork-upload'
+      assign artwork = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_tags contains 'custom-lab'
+      assign artwork = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_tags contains 'grid'
+      assign artwork = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_tags contains 'motorsport'
+      assign artwork = true
+    endif
+  endif
+  if upload_known == false
+    if catalog_tags contains 'custom-teamwear'
+      assign artwork = true
+    endif
+  endif
+
+  assign lead_time = product.metafields.custom.lead_time.value
 %}
 
 {% case part %}
+  {% when 'policy-key' %}
+    {%- render 'atc-catalog-policy', product: product, part: 'key' -%}
+  {% when 'subline' %}
+    {%- render 'atc-catalog-series', product: product -%}
   {% when 'card-badge' %}
     {% if made_to_order %}
       <span class="atc-card__status atc-card__status--order">{{ 'atc.commerce.made_to_order' | t }}</span>
     {% endif %}
   {% when 'lead' %}
     {% if made_to_order %}
-      <p class="atc-fulfillment__lead">{{ 'atc.commerce.made_to_order_lead' | t }}</p>
+      <p class="atc-fulfillment__lead">
+        {% if lead_time != blank %}
+          {{ 'atc.commerce.made_to_order_with_lead' | t: lead: lead_time }}
+        {% else %}
+          {{ 'atc.commerce.made_to_order_lead' | t }}
+        {% endif %}
+      </p>
     {% endif %}
   {% when 'shipping' %}
-    <p class="atc-fulfillment__shipping">
-      {% if tier == 'tier-1' %}
-        {{ 'atc.commerce.shipping_tier_1' | t }}
-      {% else %}
-        {{ 'atc.commerce.shipping_tier_standard' | t }}
-      {% endif %}
-    </p>
+    {% render 'atc-catalog-policy', product: product, part: 'message' %}
   {% when 'artwork' %}
     {% if artwork %}
       <label class="atc-fulfillment__artwork" for="AtcArtwork-{{ product.id }}">
@@ -82,7 +120,7 @@
         <input
           id="AtcArtwork-{{ product.id }}"
           type="file"
-          name="properties[Artwork]"
+          name="properties[Custom Design]"
           accept=".png,.pdf,.ai,.psd,image/png,application/pdf"
         >
         <span class="atc-fulfillment__hint">{{ 'atc.commerce.artwork_hint' | t }}</span>

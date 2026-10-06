@@ -66,9 +66,12 @@
     <span class="atc-card__title">{{ product.title | escape }}</span>
     {% render 'atc-price', item: product %}
   </div>
+  {% capture card_line %}
+    {%- render 'atc-fulfillment', product: product, part: 'subline' -%}
+  {% endcapture %}
   {% liquid
     assign card_sku = product.selected_or_first_available_variant.sku
-    assign card_line = product.metafields.custom.sub_line.value
+    assign card_line = card_line | strip
   %}
   {% if card_sku != blank %}
     <p class="atc-card__meta">
@@ -82,6 +85,7 @@
       <p class="atc-card__meta">{{ card_line | escape }}</p>
     {% endif %}
   {% endif %}
+  {% render 'atc-fulfillment', product: product, part: 'shipping' %}
   {% unless product.has_only_default_variant %}
     {% if product.available %}
       {% assign available_variants = product.variants | where: 'available', true %}

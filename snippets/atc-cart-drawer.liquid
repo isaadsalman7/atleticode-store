@@ -1,8 +1,8 @@
 {% doc %}
   Renders the made-to-order lead time, tier shipping note, and artwork previews for the current cart.
 
-  Free worldwide shipping is stated only when every line is tier 1.
-  A mixed cart says tier 1 lines include free shipping and the rest is calculated at checkout.
+  Free worldwide shipping is stated only when every line uses the Free Worldwide catalog policy.
+  A mixed cart says those lines ship free and the other lines keep their flat rate.
 
   @param {boolean} [show_files] - When false, omit artwork previews and keep the timing and shipping notes
 
@@ -16,28 +16,12 @@
     assign other_count = 0
   %}
   {% for item in cart.items %}
+    {% capture line_policy %}
+      {%- render 'atc-fulfillment', product: item.product, part: 'policy-key' -%}
+    {% endcapture %}
     {% liquid
-      assign line_tier = item.product.metafields.custom.shipping_tier.value | downcase
-      if line_tier == blank
-        if item.product.tags contains 'tier-1'
-          assign line_tier = 'tier-1'
-        endif
-      endif
-      if line_tier == blank
-        if item.product.tags contains 'shipping-tier-1'
-          assign line_tier = 'tier-1'
-        endif
-      endif
-      if line_tier == 'tier_1'
-        assign line_tier = 'tier-1'
-      endif
-      if line_tier == '1'
-        assign line_tier = 'tier-1'
-      endif
-      if line_tier == 'free'
-        assign line_tier = 'tier-1'
-      endif
-      if line_tier == 'tier-1'
+      assign line_policy = line_policy | strip
+      if line_policy == 'free'
         assign tier_one_count = tier_one_count | plus: 1
       else
         assign other_count = other_count | plus: 1
@@ -57,7 +41,7 @@
         {% if tier_one_count > 0 %}
           {{ 'atc.commerce.shipping_mixed' | t }}
         {% else %}
-          {{ 'atc.commerce.shipping_tier_standard' | t }}
+          {{ 'atc.commerce.shipping_flat_rates' | t }}
         {% endif %}
       {% endif %}
     </p>

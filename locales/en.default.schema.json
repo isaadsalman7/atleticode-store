@@ -309,6 +309,7 @@
       "description_info": "Leave blank to use the collection description.",
       "specimens": "Specimen grid",
       "products_per_page": "Products per page",
+      "filter_info": "Collection filters follow Shopify Search & Discovery. Tag products velocity, titan, grid, pulse, focus, forge, or custom-lab, and set the product type to the catalog collection name.",
       "lab_synthesis": "Lab synthesis",
       "stat": "Stat",
       "value": "Value",
@@ -332,7 +333,7 @@
       "region_eu": "EU",
       "region_aus": "AUS",
       "region_metric": "Metric cm/kg",
-      "fulfillment_info": "Tier 1 free shipping uses metafield custom.shipping_tier or the tag tier-1. Artwork upload uses custom.artwork_upload or the tags artwork-upload, custom-lab, and grid. Specs use custom.material, gsm, weight, hydrostatic_head, drag_coefficient, and care. Sub-line uses custom.sub_line.",
+      "fulfillment_info": "Map the catalog with product type and tags: Performance Apparel / velocity, Performance Gloves / titan, Motorsport / grid, Team Sports / pulse, Precision Sports / focus, Accessories / forge, Custom Teamwear / custom-lab. Shipping uses custom.shipping_policy. Artwork uses custom.custom_upload. Specs use custom.material, weight, dimensions, gender, and care.",
       "related": "Related products",
       "cart": "Cart",
       "search": "Search"
