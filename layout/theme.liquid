@@ -20,6 +20,7 @@
     {%- render 'meta-tags' -%}
     {%- render 'stylesheets' -%}
     {{ 'atleticode.css' | asset_url | stylesheet_tag }}
+    {{ 'bebas-neue-400.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2' }}
     {%- render 'card-hover-effect-styles' -%}
     {%- render 'fonts' -%}
     {%- render 'scripts' -%}

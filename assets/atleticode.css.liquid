@@ -1,4 +1,12 @@
 @font-face {
+  font-family: "Bebas Neue";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("{{ 'bebas-neue-400.woff2' | asset_url }}") format("woff2");
+}
+
+@font-face {
   font-family: "Space Grotesk";
   font-style: normal;
   font-weight: 500;
@@ -50,7 +58,7 @@
   --atc-cyan: #38bdf8;
   --atc-amber: #f59e0b;
   --atc-emerald: #22c55e;
-  --atc-font-display: "Space Grotesk", "Arial Narrow", sans-serif;
+  --atc-font-display: "Bebas Neue", "Arial Narrow", sans-serif;
   --atc-font-body: "Inter", "Helvetica Neue", sans-serif;
   --atc-font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", menlo, monospace;
   --atc-radius: 0px;
@@ -76,10 +84,9 @@
   top: 0;
   z-index: 50;
   width: 100%;
-  background: rgb(255 255 255 / 80%);
-  border-bottom: 1px solid var(--atc-line);
-  backdrop-filter: blur(12px);
-  color: var(--atc-ink);
+  background: var(--atc-bg-dark);
+  border-bottom: 1px solid var(--atc-line-dark);
+  color: var(--atc-white);
 }
 
 .atc-header__bar {
@@ -96,16 +103,16 @@
 .atc-header__action,
 .atc-header__menu-toggle {
   font-family: var(--atc-font-display);
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--atc-ink);
+  color: var(--atc-white);
 }
 
   .atc-header__brand {
-  font-size: 1.25rem;
-  letter-spacing: 0.2em;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
   line-height: 1;
   min-width: 0;
 }
@@ -141,8 +148,8 @@
   min-width: 16rem;
   margin: 0;
   padding: 0.35rem 0;
-  border: 1px solid var(--atc-ink);
-  background: var(--atc-bg);
+  border: 1px solid var(--atc-line-dark);
+  background: var(--atc-bg-dark);
   flex-direction: column;
   gap: 0;
 }
@@ -169,11 +176,11 @@
 
 .atc-header__link:hover,
 .atc-header__link.is-current {
-  color: var(--atc-ink);
+  color: var(--atc-white);
 }
 
 .atc-header__link.is-current {
-  border-bottom-color: var(--atc-ink);
+  border-bottom-color: var(--atc-white);
 }
 
 .atc-header__actions {
@@ -244,8 +251,8 @@
   min-width: 1.1rem;
   aspect-ratio: auto;
   padding: 0.15rem 0.3rem;
-  background: var(--atc-ink);
-  color: var(--atc-white);
+  background: var(--atc-white);
+  color: var(--atc-bg-dark);
   font-family: var(--atc-font-mono);
   font-size: 10px;
   letter-spacing: 0.08em;
@@ -311,8 +318,8 @@
 }
 
 .atc-header__drawer {
-  border-top: 1px solid var(--atc-line);
-  background: var(--atc-bg);
+  border-top: 1px solid var(--atc-line-dark);
+  background: var(--atc-bg-dark);
   padding: 1.5rem clamp(1.25rem, 4vw, 3rem) 2rem;
 }
 
@@ -347,8 +354,9 @@
 
 .atc-header a:focus-visible,
 .atc-header button:focus-visible,
-.atc-header shopify-account:focus-visible {
-  outline: var(--atc-focus);
+.atc-header shopify-account:focus-visible,
+.atc-header select:focus-visible {
+  outline: 2px solid var(--atc-white);
   outline-offset: 3px;
 }
 
@@ -421,22 +429,27 @@
   margin: 0 0 2.5rem;
   font-family: var(--atc-font-display);
   font-size: clamp(2rem, 4vw, 2.5rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   line-height: 1;
   text-transform: uppercase;
 }
 
-.atc-footer__copyright {
+.atc-footer__copyright,
+.atc-footer__policy {
   margin: 0;
-  max-width: 28rem;
+  max-width: 36rem;
   font-family: var(--atc-font-body);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   line-height: 1.6;
-  text-transform: uppercase;
-  color: #a3a3a3;
+  text-transform: none;
+  color: #d4d4d4;
+}
+
+.atc-footer__policy {
+  margin-top: 0.75rem;
 }
 
 .atc-footer__columns {
@@ -504,9 +517,9 @@
   background: var(--atc-ink);
   color: var(--atc-white);
   font-family: var(--atc-font-display);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   line-height: 1;
   text-align: center;
   text-decoration: none;
@@ -621,4 +634,39 @@
   .atc-header__link {
     transition: none;
   }
+}
+
+.atc-market {
+  margin: 0;
+}
+
+.atc-market select,
+.atc-header__market {
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0 0.5rem;
+  border: 1px solid var(--atc-white);
+  border-radius: 0;
+  background: var(--atc-bg-dark);
+  color: var(--atc-white);
+  font-family: var(--atc-font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.atc-market select:focus-visible {
+  outline: var(--atc-focus);
+  outline-offset: 3px;
+}
+
+[class^="atc-"] :is(h1, h2, h3),
+.atc-header__brand,
+.atc-footer__brand,
+.atc-card__title,
+.atc-button {
+  font-family: var(--atc-font-display);
+  font-weight: 400;
+  letter-spacing: 0.05em;
 }

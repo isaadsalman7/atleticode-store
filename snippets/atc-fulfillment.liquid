@@ -88,8 +88,6 @@ assign made_to_order = true
       assign artwork = true
     endif
   endif
-
-  assign lead_time = product.metafields.custom.lead_time.value
 %}
 
 {% case part %}
@@ -103,13 +101,7 @@ assign made_to_order = true
     {% endif %}
   {% when 'lead' %}
     {% if made_to_order %}
-      <p class="atc-fulfillment__lead">
-        {% if lead_time != blank %}
-          {{ 'atc.commerce.made_to_order_with_lead' | t: lead: lead_time }}
-        {% else %}
-          {{ 'atc.commerce.made_to_order_lead' | t }}
-        {% endif %}
-      </p>
+      <p class="atc-fulfillment__lead">{{ 'atc.commerce.made_to_order_lead' | t }}</p>
     {% endif %}
   {% when 'shipping' %}
     {% render 'atc-catalog-policy', product: product, part: 'message' %}
@@ -124,6 +116,7 @@ assign made_to_order = true
           accept=".png,.pdf,.ai,.psd,image/png,application/pdf"
         >
         <span class="atc-fulfillment__hint">{{ 'atc.commerce.artwork_hint' | t }}</span>
+        <span class="atc-fulfillment__hint">{{ 'atc.commerce.artwork_proofing' | t }}</span>
       </label>
     {% endif %}
 {% endcase %}
@@ -140,15 +133,19 @@ assign made_to_order = true
   .atc-fulfillment__shipping,
   .atc-fulfillment__hint {
     margin: 0;
-    font-family: var(--atc-font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
+    font-family: var(--atc-font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
     line-height: 1.5;
-    text-transform: uppercase;
   }
 
   .atc-fulfillment__lead {
     color: var(--atc-ink);
+    font-family: var(--atc-font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.06em;
+    line-height: 1.1;
+    text-transform: uppercase;
   }
 
   .atc-fulfillment__shipping,

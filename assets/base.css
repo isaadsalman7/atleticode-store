@@ -1836,3 +1836,32 @@ main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
     margin-top: calc(var(--header-height) * var(--transparent-header-offset-boolean) * -1);
   }
 }
+
+/* ATLETICODE display stack. Face files load from atleticode.css.liquid. */
+h1,
+h2,
+h3,
+.h1,
+.h2,
+.h3,
+.button,
+.button-secondary {
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body,
+.cart-primary-typography,
+.cart-secondary-typography {
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+.button,
+.button-secondary,
+input,
+select,
+textarea {
+  border-radius: 0;
+}

@@ -53,6 +53,28 @@
         {{ 'atc.header.shop' | t }}
       </a>
 
+      {% if localization.available_countries.size > 1 %}
+        {% form 'localization', class: 'atc-market' %}
+          <label class="visually-hidden" for="AtcMarket-{{ section.id }}">
+            {{ 'atc.header.market' | t }}
+          </label>
+          <select id="AtcMarket-{{ section.id }}" name="country_code" data-atc-market>
+            {% for country in localization.available_countries %}
+              <option
+                value="{{ country.iso_code }}"
+                {% if country.iso_code == localization.country.iso_code %}
+                  selected
+                {% endif %}
+              >
+                {{ country.currency.iso_code }} · {{ country.name }}
+              </option>
+            {% endfor %}
+          </select>
+        {% endform %}
+      {% else %}
+        <p class="atc-header__market">{{ localization.country.currency.iso_code }}</p>
+      {% endif %}
+
       {% if shop.customer_accounts_enabled %}
         <div class="atc-account color-custom-popover">
           <shopify-account>

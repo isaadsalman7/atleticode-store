@@ -182,9 +182,19 @@ assign policy_label = product.metafields.custom.shipping_policy.value | strip
 {% if part == 'key' %}
   {{- policy_key -}}
 {% elsif part == 'message' %}
+  {% capture market_token %}
+    {%- render 'atc-market' -%}
+  {% endcapture %}
+  {% assign market_token = market_token | strip %}
   <p class="atc-fulfillment__shipping">
     {% if policy_key == 'free' %}
-      {{ 'atc.commerce.shipping_tier_1' | t }}
+      {% if market_token == 'pakistan' %}
+        {{ 'atc.commerce.shipping_tier_1_pk' | t }}
+      {% else %}
+        {{ 'atc.commerce.shipping_tier_1' | t }}
+      {% endif %}
+    {% elsif market_token == 'pakistan' %}
+      {{ 'atc.commerce.shipping_domestic' | t }}
     {% elsif policy_key == 'flat-12' %}
       {{ 'atc.commerce.shipping_flat_12' | t }}
     {% elsif policy_key == 'flat-15' %}

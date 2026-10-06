@@ -381,10 +381,12 @@
       "open_menu": "Open menu",
       "close_menu": "Close menu",
       "search": "Search",
+      "market": "Country and currency",
       "menu_missing": "Select a menu to show navigation links."
     },
     "footer": {
-      "copyright": "© {{ year }} {{ shop_name }}. Engineered for elite performance."
+      "copyright": "© {{ year }} {{ shop_name }}. Engineered for elite performance.",
+      "policy": "Made to order in Sialkot. Handcrafted in 10–14 business days before dispatch. International orders ship with DHL, FedEx, or UPS Express. Pakistan orders ship by local express."
     },
     "home": {
       "from_price": "From {{ price }}",
@@ -436,9 +438,12 @@
       "search_empty": "No results for “{{ terms }}”.",
       "search_count": "{{ count }} results for “{{ terms }}”.",
       "made_to_order": "Made to order",
-      "made_to_order_lead": "Made to order. Crafted for performance. Delivered in 10–14 days.",
+      "made_to_order_lead": "Made to order — handcrafted in 10–14 business days before dispatch.",
       "made_to_order_with_lead": "Made to order. Crafted for performance. {{ lead }}",
+      "cart_agreement": "Pre-order / made-to-order agreement: Items are produced specifically for you upon payment and ship within 10–14 business days.",
       "shipping_tier_1": "Free worldwide shipping included",
+      "shipping_tier_1_pk": "Free local express delivery",
+      "shipping_domestic": "Domestic flat rate in PKR, confirmed at checkout.",
       "shipping_tier_standard": "Shipping is a regional flat rate, calculated at checkout.",
       "shipping_flat_12": "Flat $12 shipping. Free over $150.",
       "shipping_flat_15": "Flat $15 shipping.",
@@ -448,6 +453,12 @@
       "shipping_mixed": "Free worldwide shipping applies to included lines. Other lines use their flat rate at checkout.",
       "artwork_label": "Custom design",
       "artwork_hint": "PNG, PDF, AI, or PSD. Optional.",
+      "artwork_proofing": "Custom artwork approvals add 1–2 business days to initial proofing before manufacturing begins.",
+      "dossier_heading": "Production and delivery dossier",
+      "dossier_origin": "Every piece is handcrafted to order by the Sialkot workshop, then inspected before it leaves the bench.",
+      "dossier_world": "International dispatch uses DHL, FedEx, or UPS Express after the 10–14 business day production window.",
+      "dossier_pakistan": "Pakistan orders dispatch by local express after the 10–14 business day production window. International express calculators do not apply.",
+      "dossier_landed": "Landed pricing states import duty and tax before payment on international orders.",
       "regions": "Size regions",
       "region_us": "US",
       "region_uk": "UK",

@@ -69,8 +69,8 @@
           "type": "protocol",
           "settings": {
             "number": "02",
-            "heading": "Global precision logistics",
-            "text": "Made to order in Sialkot and delivered worldwide in 10–14 business days. Motorsport, precision sports, and elite boxing include free worldwide shipping. Apparel, mid-range gloves, and accessories use a regional flat rate calculated at checkout. Orders dispatch through DHL, FedEx, and UPS Express. Landed pricing states duties before payment.",
+            "heading": "Production and delivery",
+            "text": "Every item is handcrafted to order in Sialkot and held for 10–14 business days before dispatch. International orders leave by DHL, FedEx, or UPS Express, with landed pricing and import tax stated before payment. Pakistan orders use local express and domestic PKR rates. Motorsport and precision sports include free worldwide shipping, or free local express inside Pakistan. Apparel, gloves, accessories, and teamwear use the flat rate for that market.",
             "link_label": "Track an order",
             "link": "/account",
             "spec_label_1": "Origin",
@@ -78,9 +78,9 @@
             "spec_label_2": "Window",
             "spec_value_2": "10–14 business days",
             "spec_label_3": "Carriers",
-            "spec_value_3": "DHL, FedEx, UPS Express",
+            "spec_value_3": "DHL, FedEx, UPS / local express",
             "spec_label_4": "Pricing",
-            "spec_value_4": "Landed at checkout"
+            "spec_value_4": "Landed, or PKR domestic"
           }
         },
         "care": {

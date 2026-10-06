@@ -33,16 +33,24 @@
   {% endfor %}
 
   <div class="atc-cart-notice">
-    <p>{{ 'atc.commerce.made_to_order_lead' | t }}</p>
+    <p>{{ 'atc.commerce.cart_agreement' | t }}</p>
+    {% capture market_token %}
+      {%- render 'atc-market' -%}
+    {% endcapture %}
+    {% assign market_token = market_token | strip %}
     <p>
       {% if other_count == 0 %}
-        {{ 'atc.commerce.shipping_tier_1' | t }}
-      {% else %}
-        {% if tier_one_count > 0 %}
-          {{ 'atc.commerce.shipping_mixed' | t }}
+        {% if market_token == 'pakistan' %}
+          {{ 'atc.commerce.shipping_tier_1_pk' | t }}
         {% else %}
-          {{ 'atc.commerce.shipping_flat_rates' | t }}
+          {{ 'atc.commerce.shipping_tier_1' | t }}
         {% endif %}
+      {% elsif market_token == 'pakistan' %}
+        {{ 'atc.commerce.shipping_domestic' | t }}
+      {% elsif tier_one_count > 0 %}
+        {{ 'atc.commerce.shipping_mixed' | t }}
+      {% else %}
+        {{ 'atc.commerce.shipping_flat_rates' | t }}
       {% endif %}
     </p>
   </div>
@@ -58,11 +66,10 @@
 
   .atc-cart-notice p {
     margin: 0;
-    font-family: var(--atc-font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
+    font-family: var(--atc-font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
     line-height: 1.5;
-    text-transform: uppercase;
   }
 
   #cart-drawer .atc-cart-notice p {

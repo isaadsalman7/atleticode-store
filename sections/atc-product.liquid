@@ -270,6 +270,23 @@
   {% elsif request.design_mode %}
     <p class="atc-product__specs-note">{{ 'atc.commerce.specs_empty' | t }}</p>
   {% endif %}
+
+  {% capture market_token %}
+    {%- render 'atc-market' -%}
+  {% endcapture %}
+  {% assign market_token = market_token | strip %}
+  <details class="atc-product__dossier">
+    <summary>{{ 'atc.commerce.dossier_heading' | t }}</summary>
+    <div class="atc-product__dossier-body">
+      <p>{{ 'atc.commerce.dossier_origin' | t }}</p>
+      {% if market_token == 'pakistan' %}
+        <p>{{ 'atc.commerce.dossier_pakistan' | t }}</p>
+      {% else %}
+        <p>{{ 'atc.commerce.dossier_world' | t }}</p>
+      {% endif %}
+      <p>{{ 'atc.commerce.dossier_landed' | t }}</p>
+    </div>
+  </details>
 </section>
 
 {% stylesheet %}
@@ -339,7 +356,7 @@
     font-family: var(--atc-font-display);
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     font-weight: 700;
-    letter-spacing: -0.04em;
+    letter-spacing: 0.05em;
     line-height: 0.92;
     text-transform: uppercase;
     overflow-wrap: break-word;
@@ -478,26 +495,44 @@
     border-bottom: 1px solid var(--atc-line);
   }
 
-  .atc-product__specs summary {
+  .atc-product__specs summary,
+  .atc-product__dossier summary {
     display: flex;
     align-items: center;
     min-height: 3rem;
     cursor: pointer;
-    font-family: var(--atc-font-mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
+    font-family: var(--atc-font-display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
-  .atc-product__specs summary:focus-visible {
+  .atc-product__specs summary:focus-visible,
+  .atc-product__dossier summary:focus-visible {
     outline: var(--atc-focus);
     outline-offset: 3px;
   }
 
   .atc-product__specs .metafield-rich_text_field,
-  .atc-product__specs p {
+  .atc-product__specs p,
+  .atc-product__dossier-body p {
     margin: 0 0 1rem;
     max-width: 42rem;
+    font-family: var(--atc-font-body);
+    letter-spacing: 0;
+    line-height: 1.6;
+    text-transform: none;
+  }
+
+  .atc-product__dossier {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--atc-line);
+    border-bottom: 1px solid var(--atc-line);
+  }
+
+  .atc-product__dossier-body {
+    padding-bottom: 1rem;
   }
 
   .atc-product__specs-note {

@@ -249,4 +249,11 @@
       })
       .catch(function () {});
   });
+
+  document.querySelectorAll("[data-atc-market]").forEach(function (select) {
+    select.addEventListener("change", function () {
+      var form = select.closest("form");
+      if (form) form.submit();
+    });
+  });
 })();

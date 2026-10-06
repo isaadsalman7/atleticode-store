@@ -1,0 +1,23 @@
+{% doc %}
+  Outputs the active storefront market token.
+
+  Returns `pakistan` when the Shopify Markets country is Pakistan or the presentment currency is PKR.
+  Returns `world` for every other market. Prices themselves stay on the `money` filter, which follows the active market currency.
+
+  @example
+  {% render 'atc-market' %}
+{% enddoc %}
+
+{% liquid
+  assign market_token = 'world'
+  if localization.country.iso_code == 'PK'
+    assign market_token = 'pakistan'
+  endif
+  if localization.country.currency.iso_code == 'PKR'
+    assign market_token = 'pakistan'
+  endif
+  if cart.currency.iso_code == 'PKR'
+    assign market_token = 'pakistan'
+  endif
+%}
+{{- market_token -}}
